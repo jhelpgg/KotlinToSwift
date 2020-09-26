@@ -9,10 +9,9 @@ private val KEY_WORDS_REPLACEMENT = arrayOf(
     Pair(Pattern.compile("(^|[^a-zA-Z0-9_])null([^a-zA-Z0-9_]|\$)"), "$1nil$2"),
     Pair(Pattern.compile("(^|[^a-zA-Z0-9_])println([^a-zA-Z0-9_]|\$)"), "$1print$2"),
     Pair(Pattern.compile("(^|[^a-zA-Z0-9_])Boolean([^a-zA-Z0-9_]|\$)"), "$1Bool$2"),
-
     Pair(Pattern.compile("(^|[^a-zA-Z0-9_])CommonList([^a-zA-Z0-9_]|\$)"), "$1Array$2"),
     Pair(Pattern.compile("(^|[^a-zA-Z0-9_])CommonMap([^a-zA-Z0-9_]|\$)"), "$1Dictionary$2"),
-
+    Pair(Pattern.compile("(^|[^a-zA-Z0-9_])do([^a-zA-Z0-9_]|\$)"), "$1repeat$2"),
     Pair(Pattern.compile("(^|[^a-zA-Z0-9_])\\?:([^a-zA-Z0-9_]|\$)"), "$1??$2"),
     Pair(Pattern.compile("!!"), "!"),
     Pair(Pattern.compile("([^.]*)\\.\\.([^.]*)"), "$1...$2"),
