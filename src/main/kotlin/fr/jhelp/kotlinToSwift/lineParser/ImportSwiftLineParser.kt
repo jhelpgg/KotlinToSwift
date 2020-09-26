@@ -1,4 +1,4 @@
-package fr.jhelp.kotlinToSwift
+package fr.jhelp.kotlinToSwift.lineParser
 
 import java.lang.StringBuilder
 import java.util.regex.Pattern

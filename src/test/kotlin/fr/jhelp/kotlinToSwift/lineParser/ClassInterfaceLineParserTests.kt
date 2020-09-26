@@ -1,4 +1,4 @@
-package fr.jhelp.kotlinToSwift
+package fr.jhelp.kotlinToSwift.lineParser
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -10,7 +10,7 @@ class ClassInterfaceLineParserTests
     {
         val classInterfaceLineParser = ClassInterfaceLineParser()
         Assertions.assertEquals("public class Person",
-        classInterfaceLineParser.parse("public class Person"))
+                                classInterfaceLineParser.parse("public class Person"))
 
         Assertions.assertEquals("internal class Car : Engine",
                                 classInterfaceLineParser.parse("internal class Car : Engine"))

@@ -1,4 +1,4 @@
-package fr.jhelp.kotlinToSwift
+package fr.jhelp.kotlinToSwift.lineParser
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test

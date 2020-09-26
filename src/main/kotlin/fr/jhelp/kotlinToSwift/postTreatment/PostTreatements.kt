@@ -1,4 +1,4 @@
-package fr.jhelp.kotlinToSwift
+package fr.jhelp.kotlinToSwift.postTreatment
 
 import fr.jhelp.kotlinToSwift.protocol.parseProtocolsInFiles
 import java.io.File

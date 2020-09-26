@@ -1,4 +1,4 @@
-package fr.jhelp.kotlinToSwift
+package fr.jhelp.kotlinToSwift.postTreatment
 
 import java.util.regex.Pattern
 

@@ -1,8 +1,8 @@
-package fr.jhelp.kotlinToSwift
+package fr.jhelp.kotlinToSwift.lineParser
 
 private val AS_IS_ELEMENTS = arrayOf("{", "}")
 
-class AsIsParser : LineParser
+class AsIsLineParser : LineParser
 {
     override fun parse(trimLine: String): String
     {

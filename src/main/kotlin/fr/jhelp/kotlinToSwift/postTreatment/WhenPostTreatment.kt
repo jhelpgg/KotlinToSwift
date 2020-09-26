@@ -1,5 +1,6 @@
-package fr.jhelp.kotlinToSwift
+package fr.jhelp.kotlinToSwift.postTreatment
 
+import fr.jhelp.kotlinToSwift.endCurlyIndex
 import java.io.File
 import java.util.regex.Pattern
 

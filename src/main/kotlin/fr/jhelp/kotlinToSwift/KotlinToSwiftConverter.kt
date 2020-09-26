@@ -1,5 +1,7 @@
 package fr.jhelp.kotlinToSwift
 
+import fr.jhelp.kotlinToSwift.lineParser.parseLine
+import fr.jhelp.kotlinToSwift.postTreatment.postTreatments
 import fr.jhelp.kotlinToSwift.protocol.parseProtocolsInFiles
 import java.io.BufferedReader
 import java.io.BufferedWriter

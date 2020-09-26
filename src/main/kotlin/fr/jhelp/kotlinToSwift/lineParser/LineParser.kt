@@ -1,4 +1,4 @@
-package fr.jhelp.kotlinToSwift
+package fr.jhelp.kotlinToSwift.lineParser
 
 interface LineParser
 {
@@ -27,7 +27,7 @@ val PARSERS: Array<LineParser> =
                 IfForWhileLineParser(),
                 ImportSwiftLineParser(),
                 ClosureLambdaLineParser(),
-                AsIsParser())
+                AsIsLineParser())
 
 /**
  * Convenient method for parse (Use parsers in good order)
