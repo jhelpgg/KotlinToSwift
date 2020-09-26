@@ -79,6 +79,7 @@ fun swiftTransformer(directorySource: File, directoryDestination: File)
 
     parseProtocolsInFiles(listSwiftFiles)
     parseCompanionInFiles(listSwiftFiles)
+    parseConstructorInFiles(listSwiftFiles)
 }
 
 private fun internalSwiftTransformer(source: File, destination: File)
