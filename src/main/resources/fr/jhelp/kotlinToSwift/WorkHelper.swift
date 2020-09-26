@@ -4,6 +4,11 @@ typealias Long = Int64
 
 extension String
 {
+    func isEmpty() -> Bool
+    {
+       return self.isEmpty
+    }
+
     func isNotEmpty() -> Bool
     {
        return !self.isEmpty
