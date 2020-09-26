@@ -77,10 +77,7 @@ fun swiftTransformer(directorySource: File, directoryDestination: File)
         }
     }
 
-    parseWhenInFiles(listSwiftFiles)
-    parseProtocolsInFiles(listSwiftFiles)
-    parseCompanionInFiles(listSwiftFiles)
-    parseConstructorInFiles(listSwiftFiles)
+    postTreatments(listSwiftFiles)
 }
 
 private fun internalSwiftTransformer(source: File, destination: File)

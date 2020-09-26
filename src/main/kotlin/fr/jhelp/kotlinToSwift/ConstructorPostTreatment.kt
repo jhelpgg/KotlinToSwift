@@ -8,17 +8,6 @@ private const val GROUP_CONSTRUCTOR = 1
 private const val GROUP_SPACE = 2
 private const val GROUP_SUPER = 3
 
-fun parseConstructorInFiles(files: List<File>)
-{
-    var transformed: String
-
-    for (file in files)
-    {
-        transformed = parseConstructorInFile(file.readText())
-        file.writeText(transformed)
-    }
-}
-
 fun parseConstructorInFile(file: String): String
 {
     val matcher = startConstructorPattern.matcher(file)

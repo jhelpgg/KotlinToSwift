@@ -5,17 +5,6 @@ import java.util.regex.Pattern
 
 private val startCompanionPattern = Pattern.compile("companion\\s+object\\s*\\{")
 
-fun parseCompanionInFiles(files: List<File>)
-{
-    var transformed: String
-
-    for (file in files)
-    {
-        transformed = parseCompanionInFile(file.readText())
-        file.writeText(transformed)
-    }
-}
-
 fun parseCompanionInFile(file: String): String
 {
     val matcher = startCompanionPattern.matcher(file)

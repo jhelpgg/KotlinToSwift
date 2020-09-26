@@ -13,17 +13,6 @@ private const val GROUP_CASE_CURLY = 3
 private const val GROUP_CASE_CURLY_SPACE = 4
 private val elsePattern = Pattern.compile("\\s*else\\s*")
 
-fun parseWhenInFiles(files: List<File>)
-{
-    var transformed: String
-
-    for (file in files)
-    {
-        transformed = parseWhenInFile(file.readText())
-        file.writeText(transformed)
-    }
-}
-
 fun parseWhenInFile(file: String): String
 {
     val transformed = StringBuilder()
