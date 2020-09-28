@@ -6,9 +6,15 @@ private class ToSwift
 
 fun main(args: Array<String>)
 {
+    if (args.size < 2)
+    {
+        println("Need Kotlin source directory and Swift destination directory")
+        return
+    }
+
     //Init
-    val source = File("/home/gerardbourriaud/Work/kotlinLightSamples/src/main/kotlin")
-    val destination = File("/home/gerardbourriaud/Work/kotlinLightSamples/src/main/swift/Sources/swift/")
+    val source = File(args[0])
+    val destination = File(args[1])
     destination.deleteRecursively()
 
     //Transform code
