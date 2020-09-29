@@ -2,8 +2,12 @@ import Dispatch
 
 typealias Long = Int64
 
+typealias Byte = Int8
+
 extension String
 {
+    var length : Int { get { return self.count } }
+
     func isEmpty() -> Bool
     {
        return self.isEmpty
@@ -13,10 +17,102 @@ extension String
     {
        return !self.isEmpty
     }
+
+    func toInt() -> Int
+    {
+        return Int(self) ?? 0
+    }
+
+    func startsWith(_ start:String) -> Bool
+    {
+        return self.hasPrefix(start)
+    }
+
+    func indexOf(_ searched:String) -> Int
+    {
+        return self.indexOf(searched, 0)
+    }
+
+    func indexOf(_ searched:String, _ index:Int) -> Int
+    {
+        if(searched.isEmpty)
+        {
+            return index
+        }
+
+        let selfArray = Array(self.unicodeScalars)
+        let searchedArray = Array(searched.unicodeScalars)
+        let limit = selfArray.count - searchedArray.count + 1
+        var index = index
+        var check = 0
+        var look = 0
+
+        while(index<limit)
+        {
+            if(selfArray[index] == searchedArray[0])
+            {
+                check = index + 1
+                look = 1
+
+                while(look < searched.count)
+                {
+                    if(selfArray[check] != searchedArray[look])
+                    {
+                        break
+                    }
+
+                    look = look + 1
+                    check = check + 1
+                }
+
+                if(look >= searched.count)
+                {
+                    return index
+                }
+            }
+
+            index = index + 1
+        }
+
+        return -1
+    }
+
+    func substring(_ start : Int) -> String
+    {
+        return String(self[String.Index(encodedOffset:start) ..< String.Index(encodedOffset:self.count)])
+    }
+
+    func substring(_ start : Int, _ end : Int) -> String
+    {
+        return String(self[String.Index(encodedOffset:start) ..< String.Index(encodedOffset:end)])
+    }
 }
 
 extension Int
 {
+   func toLong() -> Long
+   {
+       return Long(self)
+   }
+
+   func toFloat() -> Float
+   {
+       return Float(self)
+   }
+
+   func toDouble() -> Double
+   {
+      return Double(self)
+   }
+}
+
+extension Byte
+{
+   func toInt() -> Int
+   {
+       return Int(self)
+   }
+
    func toLong() -> Long
    {
        return Long(self)

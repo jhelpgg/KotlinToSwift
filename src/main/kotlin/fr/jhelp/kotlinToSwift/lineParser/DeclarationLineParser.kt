@@ -2,11 +2,13 @@ package fr.jhelp.kotlinToSwift.lineParser
 
 import java.util.regex.Pattern
 
-private val PATTERN_DECLARATION = Pattern.compile("(private\\s+)?(va[rl]\\s+)([a-zA-Z][a-zA-Z0-9_]*)(.*)")
+private val PATTERN_DECLARATION =
+    Pattern.compile("(private\\s+)?((?:@T|t)ry\\s+)?(va[rl]\\s+)([a-zA-Z][a-zA-Z0-9_]*)(.*)")
 private const val GROUP_DECLARATION_PRIVATE = 1
-private const val GROUP_DECLARATION_VALR = 2
-private const val GROUP_DECLARATION_NAME = 3
-private const val GROUP_DECLARATION_SPECIFICATION = 4
+private const val GROUP_DECLARATION_TRY = 2
+private const val GROUP_DECLARATION_VALR = 3
+private const val GROUP_DECLARATION_NAME = 4
+private const val GROUP_DECLARATION_SPECIFICATION = 5
 private const val PRIVATE_SET = "private set"
 
 class DeclarationLineParser : LineParser
@@ -20,6 +22,8 @@ class DeclarationLineParser : LineParser
             val parsed = StringBuilder()
 
             matcher.group(GROUP_DECLARATION_PRIVATE)?.let { parsed.append(it) }
+
+            matcher.group(GROUP_DECLARATION_TRY)?.let { parsed.append(it) }
 
             if (matcher.group(GROUP_DECLARATION_VALR).startsWith("val"))
             {
@@ -43,7 +47,15 @@ class DeclarationLineParser : LineParser
                 parsed.append(specification)
             }
 
-            return parsed.toString()
+            return if (matcher.group(GROUP_DECLARATION_TRY) != null)
+            {
+                val annotationLineParser = AnnotationLineParser()
+                annotationLineParser.parse(parsed.toString())
+            }
+            else
+            {
+                parsed.toString()
+            }
         }
 
         return ""

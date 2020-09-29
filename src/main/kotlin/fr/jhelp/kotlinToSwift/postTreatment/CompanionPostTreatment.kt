@@ -20,7 +20,10 @@ fun parseCompanionInFile(file: String): String
     val end = endCurlyIndex(file, start)
     val transformed = StringBuilder()
     transformed.append(file.substring(0, before))
-    transformed.append(file.substring(start, end - 1).replace("func ", "static func "))
+    transformed.append(file.substring(start, end - 1)
+                           .replace("func ", "static func ")
+                           .replace("var ", "static var ")
+                           .replace("let ", "static let "))
     transformed.append(file.substring(end))
     return transformed.toString()
 }
