@@ -1,7 +1,6 @@
 package fr.jhelp.kotlinToSwift.postTreatment
 
 import fr.jhelp.kotlinToSwift.endCurlyIndex
-import java.io.File
 import java.util.regex.Pattern
 
 private val startCompanionPattern = Pattern.compile("companion\\s+object\\s*\\{")
@@ -28,23 +27,23 @@ fun parseCompanionInFile(file: String): String
     var curlyIndex = 0
     var type = ""
 
-    while(matcherCompanion.find())
+    while (matcherCompanion.find())
     {
-        if( matcherCompanion.start()<indexCompanion)
+        if (matcherCompanion.start() < indexCompanion)
         {
             continue
         }
 
         transformed.append(insideCompanion.substring(indexCompanion, matcherCompanion.start()))
         transformed.append("static ")
-        type =     matcherCompanion.group(TYPE_GROUP)
+        type = matcherCompanion.group(TYPE_GROUP)
         transformed.append(type)
         transformed.append(" ")
 
-        if(type == "func")
+        if (type == "func")
         {
             curlyIndex = insideCompanion.indexOf('{', matcherCompanion.end())
-            indexCompanion =  endCurlyIndex(insideCompanion, curlyIndex + 1)
+            indexCompanion = endCurlyIndex(insideCompanion, curlyIndex + 1)
             transformed.append(insideCompanion.substring(matcherCompanion.end(), indexCompanion))
             continue
         }
