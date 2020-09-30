@@ -18,6 +18,8 @@ private val KEY_WORDS_REPLACEMENT = arrayOf(
     Pair(Pattern.compile("(^|[^a-zA-Z0-9_])shl([^a-zA-Z0-9_]|\$)"), "$1<<$2"),
     Pair(Pattern.compile("(^|[^a-zA-Z0-9_])shr([^a-zA-Z0-9_]|\$)"), "$1>>$2"),
     Pair(Pattern.compile("(^|[^a-zA-Z0-9_])\\?:([^a-zA-Z0-9_]|\$)"), "$1??$2"),
+    Pair(Pattern.compile("\\+\\+"), " += 1"),
+    Pair(Pattern.compile("--"), " -= 1"),
     Pair(Pattern.compile("!!"), "!"),
     Pair(Pattern.compile("([^.]*)\\.\\.([^.]*)"), "$1...$2"),
     Pair(Pattern.compile("(^|[^a-zA-Z0-9_])until([^a-zA-Z0-9_]|\$)"), "$1..<$2"),
