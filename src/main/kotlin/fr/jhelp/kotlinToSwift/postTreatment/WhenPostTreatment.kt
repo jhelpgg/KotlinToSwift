@@ -1,7 +1,6 @@
 package fr.jhelp.kotlinToSwift.postTreatment
 
 import fr.jhelp.kotlinToSwift.endCurlyIndex
-import java.io.File
 import java.util.regex.Pattern
 
 private val whenKeyWordPattern = Pattern.compile("when\\s*(?:\\(\\s*([a-zA-Z0-9_]+)\\s*\\))?(\\s*\\{)")
@@ -36,7 +35,7 @@ fun parseWhenInFile(file: String): String
 
         if (parameter == null)
         {
-            replaceWhenWithoutParameter(file, start, end, curlyEnd, transformed)
+            replaceWhenWithoutParameter(file, start, end, transformed)
         }
         else
         {
@@ -95,7 +94,7 @@ fun replaceWhenWithParameter(file: String,
     transformed.append(part.substring(before))
 }
 
-fun replaceWhenWithoutParameter(file: String, start: Int, end: Int, curlyEnd: String, transformed: StringBuilder)
+fun replaceWhenWithoutParameter(file: String, start: Int, end: Int, transformed: StringBuilder)
 {
     val part = file.substring(start, end - 1)
     val matcher = casePattern.matcher(part)
