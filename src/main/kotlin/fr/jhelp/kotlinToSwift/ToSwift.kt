@@ -22,6 +22,7 @@ fun main(args: Array<String>)
 
     //Transfer prebuilt files
     transferResource("WorkHelper.swift", destination)
+    transferResource("ByteStream.swift", destination)
 }
 
 private fun transferResource(resourceName: String, destination: File)

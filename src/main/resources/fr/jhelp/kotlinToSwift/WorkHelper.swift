@@ -90,6 +90,11 @@ extension String
 
 extension Int
 {
+   func toByte() -> Byte
+   {
+      return Byte(self)
+   }
+
    func toLong() -> Long
    {
        return Long(self)
@@ -131,6 +136,11 @@ extension Byte
 
 extension Long
 {
+   func toByte() -> Byte
+   {
+      return Byte(self)
+   }
+
    func toInt() -> Int
    {
        return Int(self)

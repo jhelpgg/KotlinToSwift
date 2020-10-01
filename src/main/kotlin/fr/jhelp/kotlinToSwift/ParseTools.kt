@@ -1,5 +1,13 @@
 package fr.jhelp.kotlinToSwift
 
+/**
+ * Compute index of }, corresponding to a {.
+ *
+ * It ignores { or } in String or in comments
+ *
+ * @param text Text where search the }
+ * @param start Offset **after** the { to get it's corresponding } index
+ */
 fun endCurlyIndex(text: String, start: Int): Int
 {
     val characters = text.toCharArray()
