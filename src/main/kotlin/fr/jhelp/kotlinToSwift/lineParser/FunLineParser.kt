@@ -24,13 +24,15 @@ import java.util.regex.Pattern
  *      |             \s*\{                               | 6  | Eventual { ending => {                                   |
  *      +-------------------------------------------------+----+----------------------------------------------------------+
  */
-private val FUNCTION_PATTERN = Pattern.compile("(?:(@Throws)\\s+)?((?:(?:override|private|public|internal|open)\\s+)*fun)(\\s+[a-zA-Z][a-zA-Z0-9_]*\\s*)\\((.*)\\)(?:\\s*:\\s*([a-zA-Z][a-zA-Z0-9_<>?]*))?(\\s*\\{)?")
+private val FUNCTION_PATTERN =
+    Pattern.compile("(?:(@Throws)\\s+)?((?:(?:override|private|public|internal|open)\\s+)*fun)(\\s+<[a-zA-Z0-9_, ]+>)?(\\s+[a-zA-Z][a-zA-Z0-9_]*\\s*)\\((.*)\\)(?:\\s*:\\s*([a-zA-Z][a-zA-Z0-9_<>?]*))?(\\s*\\{)?")
 private const val GROUP_FUN_THROW = 1
 private const val GROUP_FUN_DECLARATION = 2
-private const val GROUP_FUN_NAME = 3
-private const val GROUP_FUN_PARAMETERS = 4
-private const val GROUP_FUN_RETURN_TYPE = 5
-private const val GROUP_FUN_END_CURLY = 6
+private const val GROUP_FUN_GENERIC = 3
+private const val GROUP_FUN_NAME = 4
+private const val GROUP_FUN_PARAMETERS = 5
+private const val GROUP_FUN_RETURN_TYPE = 6
+private const val GROUP_FUN_END_CURLY = 7
 private val REMOVE_OVERRIDE_OF = arrayOf("toString")
 
 class FunLineParser : LineParser
@@ -56,6 +58,9 @@ class FunLineParser : LineParser
 
             // Function name
             parsed.append(name)
+
+            // generic part
+            matcherFun.group(GROUP_FUN_GENERIC)?.let { generic -> parsed.append(generic) }
 
             // Function parameters
             parsed.append('(')
