@@ -18,7 +18,7 @@ fun parseEnumFile(file: String): String
 
     val transformed = StringBuilder()
     transformed.append(file.substring(0, matcher.start()))
-    transformed.append("enum ")
+    transformed.append("public enum ")
     transformed.append(matcher.group(GROUP_NAME))
     transformed.append(matcher.group(GROUP_SPACE))
     transformed.append("{")

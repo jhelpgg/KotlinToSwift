@@ -1,10 +1,10 @@
 import Foundation
 
-typealias Long = Int64
+public typealias Long = Int64
 
-typealias Byte = Int8
+public typealias Byte = Int8
 
-extension String
+public extension String
 {
     var length : Int { get { return self.count } }
 
@@ -88,7 +88,7 @@ extension String
     }
 }
 
-extension Int
+public extension Int
 {
    func toByte() -> Byte
    {
@@ -111,7 +111,7 @@ extension Int
    }
 }
 
-extension Byte
+public extension Byte
 {
    func toInt() -> Int
    {
@@ -134,7 +134,7 @@ extension Byte
    }
 }
 
-extension Long
+public extension Long
 {
    func toByte() -> Byte
    {
@@ -157,7 +157,26 @@ extension Long
    }
 }
 
-extension Double
+public extension Float
+{
+   func toInt() -> Int
+   {
+       return Int(self)
+   }
+
+   func toLong() -> Long
+   {
+       return Long(self)
+   }
+
+   func toDouble() -> Double
+   {
+       return Double(self)
+   }
+}
+
+
+public extension Double
 {
    static var POSITIVE_INFINITY : Double { get {  return 1.0 / 0.0} }
    static var NEGATIVE_INFINITY : Double { get {  return -1.0 / 0.0} }
@@ -178,7 +197,7 @@ extension Double
    }
 }
 
-extension Array
+public extension Array
 {
     func firstOrNull(_ filter:(Element)->Bool) -> Element?
     {
@@ -186,7 +205,7 @@ extension Array
     }
 }
 
-class Math
+public class Math
 {
     static func random() -> Double
     {
@@ -194,7 +213,7 @@ class Math
     }
 }
 
-enum CommonManagedExceptions : Error
+public enum CommonManagedExceptions : Error
 {
     case Exception(_ message:String)
     case IllegalArgumentException(_ message:String)
@@ -220,7 +239,7 @@ public class Mutex
     }
 }
 
-func timeSince1970InMilliseconds() -> Long
+public func timeSince1970InMilliseconds() -> Long
 {
     return Long(NSDate().timeIntervalSince1970 * 1000.0)
 }
