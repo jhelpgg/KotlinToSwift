@@ -1,6 +1,6 @@
 package fr.jhelp.kotlinToSwift.lineParser
 
-import org.junit.jupiter.api.Assertions
+import fr.jhelp.kotlinToSwift.test.tools.assertEqualsIgnoreWhiteSpaceNumber
 import org.junit.jupiter.api.Test
 
 class CatchLineParserTests
@@ -9,13 +9,13 @@ class CatchLineParserTests
     fun parseCatch()
     {
         val catchLineParser = CatchLineParser()
-        Assertions.assertEquals("} catch {",
-                                catchLineParser.parse("} catch(error:Exception) {"))
-        Assertions.assertEquals("catch {",
-                                catchLineParser.parse("catch(error:Exception) {"))
-        Assertions.assertEquals("} catch",
-                                catchLineParser.parse("} catch(error:Exception)"))
-        Assertions.assertEquals("catch",
-                                catchLineParser.parse("catch(error:Exception)"))
+        assertEqualsIgnoreWhiteSpaceNumber("} catch {",
+                                           catchLineParser.parse("} catch(error:Exception) {"))
+        assertEqualsIgnoreWhiteSpaceNumber("catch {",
+                                           catchLineParser.parse("catch(error:Exception) {"))
+        assertEqualsIgnoreWhiteSpaceNumber("} catch",
+                                           catchLineParser.parse("} catch(error:Exception)"))
+        assertEqualsIgnoreWhiteSpaceNumber("catch",
+                                           catchLineParser.parse("catch(error:Exception)"))
     }
 }
