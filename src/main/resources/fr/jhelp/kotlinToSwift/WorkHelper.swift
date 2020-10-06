@@ -1,4 +1,4 @@
-import Dispatch
+import Foundation
 
 typealias Long = Int64
 
@@ -218,4 +218,9 @@ public class Mutex
         task()
         self.mutex.signal()
     }
+}
+
+func timeSince1970InMilliseconds() -> Long
+{
+    return Long(NSDate().timeIntervalSince1970 * 1000.0)
 }
