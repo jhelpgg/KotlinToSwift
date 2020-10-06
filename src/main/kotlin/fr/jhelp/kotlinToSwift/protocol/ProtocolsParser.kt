@@ -240,7 +240,7 @@ class ProtocolsParser
                 protocolsTypes.forEach { (protocol, types) ->
                     for (index in 0 until protocol.size)
                     {
-                        transformed.append("     typealias ${protocol[index].replaceName} = ${types[index]}\n")
+                        transformed.append("     public typealias ${protocol[index].replaceName} = ${types[index]}\n")
                     }
                 }
             }
