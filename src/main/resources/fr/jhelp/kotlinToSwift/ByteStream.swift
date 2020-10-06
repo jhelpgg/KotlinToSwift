@@ -1,6 +1,6 @@
 import Foundation
 
-class ByteStream
+public class ByteStream
 {
     private var data : Array<Byte>
     private var index : Int

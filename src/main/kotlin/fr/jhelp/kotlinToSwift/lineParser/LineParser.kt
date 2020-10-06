@@ -29,6 +29,8 @@ val PARSERS: Array<LineParser> =
                 ClosureLambdaLineParser(),
                 AsIsLineParser())
 
+const val FORCE_LINE_CONTINUE = "$@<([FORCE_LINE_CONTINUE])>@$"
+
 /**
  * Convenient method for parse (Use parsers in good order)
  */

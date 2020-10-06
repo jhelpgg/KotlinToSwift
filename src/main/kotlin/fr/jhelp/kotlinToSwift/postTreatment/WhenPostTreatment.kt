@@ -3,7 +3,7 @@ package fr.jhelp.kotlinToSwift.postTreatment
 import fr.jhelp.kotlinToSwift.endCurlyIndex
 import java.util.regex.Pattern
 
-private val whenKeyWordPattern = Pattern.compile("when\\s*(?:\\(\\s*([a-zA-Z0-9_]+)\\s*\\))?(\\s*\\{)")
+private val whenKeyWordPattern = Pattern.compile("when\\s*(?:\\(\\s*([a-zA-Z0-9_.!(), ]+)\\s*\\))?(\\s*\\{)")
 private const val GROUP_PARAMETER_NAME = 1
 private const val GROUP_END_CURLY = 2
 private val casePattern = Pattern.compile("([ \t]]*)([^ \t].*)->((\\s*)\\{)?")

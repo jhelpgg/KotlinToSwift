@@ -1,8 +1,8 @@
 package fr.jhelp.kotlinToSwift
 
+import fr.jhelp.kotlinToSwift.lineParser.FORCE_LINE_CONTINUE
 import fr.jhelp.kotlinToSwift.lineParser.parseLine
 import fr.jhelp.kotlinToSwift.postTreatment.postTreatments
-import fr.jhelp.kotlinToSwift.protocol.parseProtocolsInFiles
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
@@ -194,6 +194,11 @@ private fun parserLine(line: String, swiftWriter: BufferedWriter, inMultilineCom
     val keyWordsReplaced = keyWordReplacement(trimLine)
     val stringInterpreted = stringInterpret(keyWordsReplaced)
     val transformed = parseLine(stringInterpreted)
+
+    if (transformed == FORCE_LINE_CONTINUE)
+    {
+        return ParseStatus.LINE_CONTINUE
+    }
 
     if (transformed.isNotEmpty())
     {
