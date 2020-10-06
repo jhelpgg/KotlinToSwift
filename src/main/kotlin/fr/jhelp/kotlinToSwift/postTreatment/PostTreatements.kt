@@ -13,6 +13,7 @@ fun postTreatments(files: List<File>)
         transformed = parseWhenInFile(transformed)
         transformed = parseConstructorInFile(transformed)
         transformed = parseEnumFile(transformed)
+        transformed = parseExceptionFile(transformed)
         transformed = parseTestFile(transformed)
 
         file.writeText(transformed)

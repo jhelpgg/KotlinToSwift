@@ -23,7 +23,7 @@ class GuardInterfaceLineParser : LineParser
             parsed.append(" else ")
             parsed.append(matcher.group(GROUP_GUARD_OPEN_CURLY_THROW))
             parsed.append(matcher.group(GROUP_GUARD_SPACE_BEFORE))
-            parsed.append("CommonManagedExceptions.")
+            //parsed.append("CommonManagedExceptions.")
             parsed.append(matcher.group(GROUP_GUARD_EXCEPTION_CLOSE_CURLY))
             return parsed.toString()
         }
