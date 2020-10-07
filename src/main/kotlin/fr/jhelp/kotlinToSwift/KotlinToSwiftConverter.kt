@@ -79,7 +79,7 @@ fun swiftTransformer(directorySource: File, directoryDestination: File)
         }
     }
 
-    postTreatments(listSwiftFiles)
+   postTreatments(listSwiftFiles)
 }
 
 private fun internalSwiftTransformer(source: File, destination: File)
@@ -208,6 +208,13 @@ private fun parserLine(line: String, swiftWriter: BufferedWriter, inMultilineCom
         }
 
         swiftWriter.write(transformed)
+        swiftWriter.newLine()
+        return ParseStatus.PARSED
+    }
+
+    if(stringInterpreted.contains("@Test"))
+    {
+        swiftWriter.write(stringInterpreted)
         swiftWriter.newLine()
         return ParseStatus.PARSED
     }
