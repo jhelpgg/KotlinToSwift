@@ -15,6 +15,7 @@ fun postTreatments(files: List<File>)
         transformed = parseEnumFile(transformed)
         transformed = parseExceptionFile(transformed)
         transformed = parseTestFile(transformed)
+        transformed = parseEqualsInFile(transformed)
 
         file.writeText(transformed)
     }
