@@ -243,3 +243,8 @@ public func timeSince1970InMilliseconds() -> Long
 {
     return Long(NSDate().timeIntervalSince1970 * 1000.0)
 }
+
+public func fatal<T>(_ message:String) -> T
+{
+   fatalError(message)
+}
