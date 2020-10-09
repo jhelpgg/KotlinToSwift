@@ -17,6 +17,7 @@ fun postTreatments(files: List<File>)
         transformed = parseTestFile(transformed)
         transformed = parseEqualsInFile(transformed)
         transformed = parseComparableInFile(transformed)
+        transformed = parseToStringInFile(transformed)
 
         file.writeText(transformed)
     }
