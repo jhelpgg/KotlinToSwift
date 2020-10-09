@@ -86,6 +86,21 @@ public extension String
     {
         return String(self[String.Index(encodedOffset:start) ..< String.Index(encodedOffset:end)])
     }
+
+    func compareTo(_ other: String) -> Int
+    {
+        if(self < other)
+        {
+            return -1
+        }
+
+        if(self > other)
+        {
+            return 1
+        }
+
+        return 0
+    }
 }
 
 public extension Int
