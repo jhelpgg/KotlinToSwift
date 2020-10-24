@@ -1,8 +1,10 @@
 package fr.jhelp.kotlinToSwift.postTreatment
 
+import fr.jhelp.kotlinToSwift.indexOfIgnoreCommentString
 import java.util.regex.Pattern
 
-private val CLASS_DECLARATION_PATTERN = Pattern.compile("class\\s+([a-zA-Z0-9_]+)(\\s*:(?:\\s|.)*)Comparable<[^>]*>([^{]*\\{)")
+private val CLASS_DECLARATION_PATTERN =
+    Pattern.compile("class\\s+([a-zA-Z0-9_]+)(\\s*:(?:\\s|.)*)Comparable<[^>]*>([^{]*\\{)")
 private const val GROUP_CLASS_NAME = 1
 private const val GROUP_IMPLEMENTS_BEFORE = 2
 private const val GROUP_IMPLEMENTS_AFTER = 3
@@ -16,7 +18,14 @@ private const val GROUP_FUNCTION_DECLARATION = 2
  */
 fun parseComparableInFile(file: String): String
 {
-    val matcherClass = CLASS_DECLARATION_PATTERN.matcher(file)
+    val indexOpenCurly = file.indexOfIgnoreCommentString('{')
+
+    if (indexOpenCurly < 0)
+    {
+        return file
+    }
+
+    val matcherClass = CLASS_DECLARATION_PATTERN.matcher(file.substring(0, indexOpenCurly + 1))
 
     if (!matcherClass.find())
     {
@@ -41,7 +50,7 @@ fun parseComparableInFile(file: String): String
     result.append("Comparable")
     result.append(after)
 
-    if(!before.contains("Equatable") && !after.contains("Equatable"))
+    if (!before.contains("Equatable") && !after.contains("Equatable"))
     {
         result.append("\n     static public func == (lhs: ")
         result.append(className)

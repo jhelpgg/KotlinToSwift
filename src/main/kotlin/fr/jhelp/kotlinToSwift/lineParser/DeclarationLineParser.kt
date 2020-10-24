@@ -3,13 +3,14 @@ package fr.jhelp.kotlinToSwift.lineParser
 import java.util.regex.Pattern
 
 private val PATTERN_DECLARATION =
-    Pattern.compile("(private\\s+)?((?:@T|t)ry\\s+)?(va[rl]\\s+)([a-zA-Z][a-zA-Z0-9_]*)(.*)")
+    Pattern.compile("((?:private|internal|public)\\s+)?((?:@T|t)ry\\s+)?(va[rl]\\s+)([a-zA-Z][a-zA-Z0-9_]*)(.*)")
 private const val GROUP_DECLARATION_PRIVATE = 1
 private const val GROUP_DECLARATION_TRY = 2
 private const val GROUP_DECLARATION_VALR = 3
 private const val GROUP_DECLARATION_NAME = 4
 private const val GROUP_DECLARATION_SPECIFICATION = 5
 private const val PRIVATE_SET = "private set"
+private const val INTERNAL_SET = "internal set"
 
 class DeclarationLineParser : LineParser
 {
@@ -41,6 +42,11 @@ class DeclarationLineParser : LineParser
             {
                 parsed.insert(0, "private(set) ")
                 parsed.append(specification.substring(0, specification.length - PRIVATE_SET.length))
+            }
+            else if (specification.endsWith(INTERNAL_SET))
+            {
+                parsed.insert(0, "internal(set) ")
+                parsed.append(specification.substring(0, specification.length - INTERNAL_SET.length))
             }
             else
             {

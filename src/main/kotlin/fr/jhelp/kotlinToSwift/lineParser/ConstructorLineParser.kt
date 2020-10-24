@@ -1,70 +1,88 @@
 package fr.jhelp.kotlinToSwift.lineParser
 
+import fr.jhelp.kotlinToSwift.endParenthesisIndex
 import java.util.regex.Pattern
 
-private val PATTERN_CONSTRUCTOR =
-    Pattern.compile("(@Throws\\s+)?(@?[Oo]verride\\s+)?((?:private|internal|public)\\s+)?constructor\\s*\\(([^)]*)\\)[^:{]*(:\\s*(super|this)([^{]*))?(\\s*\\{)")
-private const val GROUP_CONSTRUCTOR_THROWS = 1
-private const val GROUP_CONSTRUCTOR_OVERRIDE = 2
-private const val GROUP_CONSTRUCTOR_PRIVATE_INTERNAL_PUBLIC = 3
-private const val GROUP_CONSTRUCTOR_PARAMETERS = 4
-private const val GROUP_CONSTRUCTOR_SUPER_THIS = 6
-private const val GROUP_CONSTRUCTOR_SUPER_THIS_PARAMETER = 7
-private const val GROUP_CONSTRUCTOR_CURLY = 8
 private val PATTERN_CONTAINS_CONSTRUCTOR = Pattern.compile("constructor\\s*\\(")
+private val PATTERN_OVERRIDE = Pattern.compile("@?[Oo]verride")
+private val PATTERN_PRIVATE_INTERNAL_PUBLIC = Pattern.compile("(private|internal|public)\\s+")
+private const val MAY_THROWS = "@Throws"
+private val PATTERN_SUPER_THIS = Pattern.compile(":\\s*(super|this)([^{]*)")
+private const val GROUP_SUPER_THIS = 1
+private const val GROUP_SUPER_THIS_PARAMETERS = 2
 
 class ConstructorLineParser : LineParser
 {
 
     override fun parse(trimLine: String): String
     {
-        val matcher = PATTERN_CONSTRUCTOR.matcher(trimLine)
-
-        if (matcher.matches())
+        if (!PATTERN_CONTAINS_CONSTRUCTOR.matcher(trimLine).find())
         {
-            val parsed = StringBuilder()
+            return ""
+        }
 
-            matcher.group(GROUP_CONSTRUCTOR_OVERRIDE)?.let { parsed.append("override ") }
-            matcher.group(GROUP_CONSTRUCTOR_PRIVATE_INTERNAL_PUBLIC)
-                ?.let { privateInternalPublic -> parsed.append(privateInternalPublic) }
-            ?: let { parsed.append("public ") }
-            parsed.append("init(")
-            parseParameters(matcher.group(GROUP_CONSTRUCTOR_PARAMETERS), parsed)
-            parsed.append(")")
-            matcher.group(GROUP_CONSTRUCTOR_THROWS)?.let { parsed.append(" throws ") }
-            parsed.append(matcher.group(GROUP_CONSTRUCTOR_CURLY))
+        if (!trimLine.endsWith('{'))
+        {
+            return FORCE_LINE_CONTINUE
+        }
+
+        val parsed = StringBuilder()
+
+        if (PATTERN_OVERRIDE.matcher(trimLine).find())
+        {
+            parsed.append("override ")
+        }
+
+        var matcher = PATTERN_PRIVATE_INTERNAL_PUBLIC.matcher(trimLine)
+
+        if (matcher.find())
+        {
+            parsed.append(matcher.group())
+        }
+        else
+        {
+            parsed.append("public ")
+        }
+
+        parsed.append("init(")
+        val start = trimLine.indexOf('(')
+        val end = endParenthesisIndex(trimLine, start + 1)
+        parseParameters(trimLine.substring(start + 1, end - 1), parsed)
+        parsed.append(")")
+
+        if (trimLine.contains(MAY_THROWS))
+        {
+            parsed.append(" throws")
+        }
+
+        parsed.append("\n     {")
+        matcher = PATTERN_SUPER_THIS.matcher(trimLine)
+
+        if (matcher.find())
+        {
+            parsed.append("\n          ")
             var convenience = false
 
-            matcher.group(GROUP_CONSTRUCTOR_SUPER_THIS)?.let { superThis ->
-                parsed.append("\n     ")
-
-                if (superThis == "this")
-                {
-                    convenience = true
-                    parsed.append("self")
-                }
-                else
-                {
-                    parsed.append("super")
-                }
-
-                parsed.append(".init")
-                parsed.append(matcher.group(GROUP_CONSTRUCTOR_SUPER_THIS_PARAMETER))
+            if (matcher.group(GROUP_SUPER_THIS) == "this")
+            {
+                convenience = true
+                parsed.append("self")
             }
+            else
+            {
+                parsed.append("super")
+            }
+
+            parsed.append(".init")
+            parsed.append(matcher.group(GROUP_SUPER_THIS_PARAMETERS))
 
             if (convenience)
             {
                 parsed.insert(0, "convenience ")
             }
-
-            return parsed.toString()
         }
 
-        if (PATTERN_CONTAINS_CONSTRUCTOR.matcher(trimLine).find())
-        {
-            return FORCE_LINE_CONTINUE
-        }
-
-        return ""
+        parsed.append("\n")
+        return parsed.toString()
     }
 }

@@ -18,9 +18,13 @@ public extension String
        return !self.isEmpty
     }
 
-    func toInt() -> Int
+    func toInt() throws -> Int
     {
-        return Int(self) ?? 0
+        let value = Int(self)
+
+        guard value != nil else { throw GenericError("Can not convert \(self) to integer") }
+
+        return value!
     }
 
     func startsWith(_ start:String) -> Bool
@@ -107,7 +111,14 @@ public extension Int
 {
    func toByte() -> Byte
    {
-      return Byte(self)
+      let value = self & 0xFF
+
+      if(value > 0x7F)
+      {
+        return Byte(value - 0x100)
+      }
+
+      return Byte(value)
    }
 
    func toLong() -> Long
@@ -226,6 +237,16 @@ public class Math
     {
         return Double.random(in: 0 ..< 1)
     }
+}
+
+func sqrt(_ number:Double) -> Double
+{
+     return number.squareRoot()
+}
+
+func sqrt(_ number:Float) -> Float
+{
+     return number.squareRoot()
 }
 
 public enum CommonManagedExceptions : Error

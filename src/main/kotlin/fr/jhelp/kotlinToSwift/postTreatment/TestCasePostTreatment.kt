@@ -1,6 +1,7 @@
 package fr.jhelp.kotlinToSwift.postTreatment
 
 import fr.jhelp.kotlinToSwift.endCurlyIndex
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 private val TEST_CASE_CLASS_PATTERN =
@@ -20,6 +21,10 @@ private val FUNCTION_TEST_PATTERN =
     Pattern.compile("@Test\\s+((?:(?:public|internal)\\s+)?fun(?:c)?\\s+)([a-zA-Z0-9_]+\\s*\\((?:\\s|.)*\\)\\s*\\{)")
 private const val TEST_DECLARATION_FUNCTION_GROUP = 1
 private const val TEST_FUNCTION_DECLARATION_GROUP = 2
+private const val TEST_HEADER = "@Test"
+private const val TEST_HEADER_SIZE = TEST_HEADER.length
+private const val TEST_FOOTER = "{"
+private const val TEST_FOOTER_SIZE = TEST_FOOTER.length
 private val ASSERTIONS_REPLACEMENT = listOf(
     Pair(Pattern.compile("(?:Assert(?:ions)?\\.)?fail\\s*\\(\\s*(\".*\")\\s*\\)"),
          "XCTFail($1)"),
@@ -92,9 +97,7 @@ fun parseTestFile(file: String): String
 
     val result = StringBuilder()
     result.append(file.substring(0, matcher.start()))
-    result.append("\nimport XCTest")
-    result.append("\n@testable import ")
-    result.append(matcher.group(REFERENCE_NAME_GROUP))
+    result.append("\nimport XCTest\n")
     result.append(matcher.group(DECLARATION_CLASS_GROUP))
     result.append(" : XCTestCase")
     result.append(matcher.group(OPEN_CURLY_GROUP))
@@ -160,27 +163,26 @@ private fun afterToTearDown(source: String): String
 private fun functionsTest(source: String): String
 {
     val destination = StringBuilder()
-    val matcher = FUNCTION_TEST_PATTERN.matcher(source)
-    var start = 0
-    var end: Int
+    var matcher: Matcher
+    var start = source.indexOf(TEST_HEADER)
+    var end = -1
 
-    while (matcher.find())
+    while (start >= 0)
     {
-        if (start > matcher.start())
+        destination.append(source.substring(end + 1, start))
+        end = source.indexOf(TEST_FOOTER, start + TEST_HEADER_SIZE)
+        matcher = FUNCTION_TEST_PATTERN.matcher(source.substring(start, end + 1))
+
+        if (matcher.matches())
         {
-            continue
+            destination.append(matcher.group(TEST_DECLARATION_FUNCTION_GROUP))
+            destination.append("test_")
+            destination.append(matcher.group(TEST_FUNCTION_DECLARATION_GROUP))
         }
 
-        end = endCurlyIndex(source, matcher.end())
-        destination.append(source.substring(start, matcher.start()))
-        destination.append(matcher.group(TEST_DECLARATION_FUNCTION_GROUP))
-        destination.append("test_")
-        destination.append(matcher.group(TEST_FUNCTION_DECLARATION_GROUP))
-        destination.append(source.substring(matcher.end(), end))
-
-        start = end
+        start = source.indexOf(TEST_HEADER, end + 1)
     }
 
-    destination.append(source.substring(start))
+    destination.append(source.substring(end + 1))
     return destination.toString()
 }
