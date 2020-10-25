@@ -22,7 +22,6 @@ fun main(args: Array<String>)
 
     //Transfer prebuilt files
     transferResource("WorkHelper.swift", destination)
-    transferResource("ByteStream.swift", destination)
     transferResource("TimeCalendar.swift", destination)
     transferResource("Pair.swift", destination)
     transferResource("GenericError.swift", destination)
