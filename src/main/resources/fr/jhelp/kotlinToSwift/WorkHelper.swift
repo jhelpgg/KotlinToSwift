@@ -247,6 +247,9 @@ public extension Array
 
 public class Math
 {
+    static let PI : Double = 3.14159265358979323846
+    static let E : Double = 2.7182818284590452354
+
     static func random() -> Double
     {
         return Double.random(in: 0 ..< 1)
