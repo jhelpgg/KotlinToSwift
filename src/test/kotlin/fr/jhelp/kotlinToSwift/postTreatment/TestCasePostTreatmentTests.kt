@@ -11,7 +11,8 @@ class TestCasePostTreatmentTests
     {
         val kotlinVersion =
             """
-                @TestCaseClass("Something")
+                @TestCaseClass
+                
                 class SomethingTests 
                 {
                     @Test
@@ -25,7 +26,7 @@ class TestCasePostTreatmentTests
         val swiftVersion =
             """
                 import XCTest
-                @testable import Something
+
                 class SomethingTests : XCTestCase
                 {
                     fun test_callMethod()
@@ -43,7 +44,8 @@ class TestCasePostTreatmentTests
     {
         val kotlinVersion =
             """
-                @TestCaseClass("Something")
+                @TestCaseClass
+                
                 class SomethingTests 
                 {
                     @Before
@@ -69,7 +71,7 @@ class TestCasePostTreatmentTests
         val swiftVersion =
             """
                 import XCTest
-                @testable import Something
+
                 class SomethingTests : XCTestCase
                 {
                     override fun setUp()

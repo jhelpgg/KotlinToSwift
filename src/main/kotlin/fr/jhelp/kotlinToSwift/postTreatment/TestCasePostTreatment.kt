@@ -5,10 +5,9 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 private val TEST_CASE_CLASS_PATTERN =
-    Pattern.compile("@TestCaseClass\\s*\\(\\s*\"(.*)\"\\s*\\)(\\s*(?:(?:public|internal)\\s+)?class\\s+[a-zA-Z0-9_]+)(\\s*\\{)")
-private const val REFERENCE_NAME_GROUP = 1
-private const val DECLARATION_CLASS_GROUP = 2
-private const val OPEN_CURLY_GROUP = 3
+    Pattern.compile("@TestCaseClass\\s(\\s*(?:(?:public|internal)\\s+)?class\\s+[a-zA-Z0-9_]+)(\\s*\\{)")
+private const val DECLARATION_CLASS_GROUP = 1
+private const val OPEN_CURLY_GROUP = 2
 private val BEFORE_PATTERN =
     Pattern.compile("@Before\\s+((?:(?:public|internal)\\s+)?fun(?:c)?\\s+)[a-zA-Z0-9_]+(\\s*\\(.*\\)\\s*\\{)")
 private const val BEFORE_DECLARATION_FUNCTION_GROUP = 1
