@@ -164,12 +164,26 @@ public extension Long
 {
    func toByte() -> Byte
    {
-      return Byte(self)
+      let value = self & 0xFF
+
+      if(value > 0x7F)
+      {
+        return Byte(value - 0x100)
+      }
+
+      return Byte(value)
    }
 
    func toInt() -> Int
    {
-       return Int(self)
+      let value = self & Long(0xFFFFFFFF)
+
+      if(value > Long(0x7F000000))
+      {
+        return Int(value - Long(0x100000000))
+      }
+
+      return Int(value)
    }
 
    func toFloat() -> Float
@@ -247,15 +261,6 @@ func sqrt(_ number:Double) -> Double
 func sqrt(_ number:Float) -> Float
 {
      return number.squareRoot()
-}
-
-public enum CommonManagedExceptions : Error
-{
-    case Exception(_ message:String)
-    case IllegalArgumentException(_ message:String)
-    case IllegalStateException(_ message:String)
-    case RuntimeException(_ message:String)
-    case NullPointerException(_ message:String)
 }
 
 public class Mutex
