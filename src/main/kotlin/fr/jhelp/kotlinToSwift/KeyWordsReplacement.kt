@@ -20,6 +20,7 @@ private val KEY_WORDS_REPLACEMENT = arrayOf(
     Pair(Pattern.compile("(^|[^a-zA-Z0-9_])\\?:([^a-zA-Z0-9_]|\$)"), "$1??$2"),
     Pair(Pattern.compile("\\+\\+"), " += 1"),
     Pair(Pattern.compile("--"), " -= 1"),
+    Pair(Pattern.compile("!!(\\s+)as(\\s+)"), "$1as!$2"),
     Pair(Pattern.compile("!!"), "!"),
     Pair(Pattern.compile("([^.]*)\\.\\.([^.]*)"), "$1...$2"),
     Pair(Pattern.compile("(^|[^a-zA-Z0-9_])until([^a-zA-Z0-9_]|\$)"), "$1..<$2"),
@@ -29,10 +30,10 @@ private val KEY_WORDS_REPLACEMENT = arrayOf(
     Pair(Pattern.compile("'\\\\u([0-9A-Fa-f]{4})'"), "\"\\\\u{$1}\""),
     Pair(Pattern.compile("([0-9]+)[lL]([^a-zA-Z0-9_\"]|\$)"), "Long($1)$2"),
     Pair(Pattern.compile("(0x[A-Fa-f0-9]+)[lL]([^a-zA-Z0-9_\"]|\$)"), "Long($1)$2"),
-    Pair(Pattern.compile("([^a-zA-Z0-9_\"][0-9]+(?:\\.[0-9]+)?)[fF]([^a-zA-Z0-9_\"]|$)"), " Float($1)$2"),
+    Pair(Pattern.compile("\\(([0-9]+(?:\\.[0-9]+)?)[fF]([^a-zA-Z0-9_\"]|$)"), "(Float($1)$2"),
+    Pair(Pattern.compile("([^a-zA-Z0-9_\"(][0-9]+(?:\\.[0-9]+)?)[fF]([^a-zA-Z0-9_\"]|$)"), " Float($1)$2"),
     Pair(Pattern.compile("\\((\\s*[a-zA-Z0-9_]+\\s+)!is(\\s+[a-zA-Z0-9_]+\\s*)\\)"), "!($1is$2)"),
     Pair(Pattern.compile("([a-zA-Z0-9_]+\\s+)!is(\\s+[a-zA-Z0-9_]+)"), "!($1is$2)"),
-    Pair(Pattern.compile("([a-zA-Z0-9_]+\\s*)!{1,2}(\\s+)as(\\s+[a-zA-Z0-9_]+)"), "$1$2as!$3"),
 )
 
 fun keyWordReplacement(string: String): String

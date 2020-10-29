@@ -13,12 +13,14 @@ fun main(args: Array<String>)
     }
 
     //Init
-    val source = File(args[0])
-    val destination = File(args[1])
+    val destination = File(args[args.size - 1])
     destination.deleteRecursively()
 
     //Transform code
-    swiftTransformer(source, destination)
+    for(sourceIndex in 0 until  args.size-1)
+    {
+        swiftTransformer(File(args[sourceIndex]), destination)
+    }
 
     //Transfer prebuilt files
     transferResource("WorkHelper.swift", destination)

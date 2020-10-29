@@ -26,10 +26,12 @@ val GROUP_GENERIC_NAME = 2
 val GROUP_GENERIC_ENDING = 3
 val METHOD_DESCRIPTION = Pattern.compile("func\\s*([a-zA-Z][a-zA-Z0-9_]*)\\s*\\(")
 val GROUP_METHOD_NAME = 1
-val METHOD_OVERRIDE_DESCRIPTION = Pattern.compile("override\\s+func\\s*([a-zA-Z][a-zA-Z0-9_]*)\\s*\\(")
+val METHOD_OVERRIDE_DESCRIPTION = Pattern.compile("((?:internal|public)\\s+)?override\\s+func\\s*([a-zA-Z][a-zA-Z0-9_]*)\\s*\\(")
+const val GROUP_OVERRIDE_INTERNAL_PUBLIC = 1
+const val GROUP_OVERRIDE_METHOD_NAME = 2
 val PUBLIC_FUN = Pattern.compile("public\\s+fun")
 
-class ProtocolsParser
+object ProtocolsParser
 {
     val protocols = HashMap<String, Protocol>()
 
@@ -308,7 +310,9 @@ class ProtocolsParser
                 transformed.append(toClear.substring(start, end))
             }
 
-            methodName = matcher.group(GROUP_METHOD_NAME)
+            matcher.group(GROUP_OVERRIDE_INTERNAL_PUBLIC)?.let { header -> transformed.append(header) }
+
+            methodName = matcher.group(GROUP_OVERRIDE_METHOD_NAME)
 
             if (methodName in methodsName)
             {
@@ -336,13 +340,12 @@ class ProtocolsParser
 
 fun parseProtocolsInFiles(files: List<File>)
 {
-    val protocolsParser = ProtocolsParser()
-    files.forEach { protocolsParser.addFile(it.readText()) }
-    protocolsParser.compile()
+    files.forEach { ProtocolsParser.addFile(it.readText()) }
+    ProtocolsParser.compile()
     var transformed: String
 
     files.forEach { file ->
-        transformed = protocolsParser.transform(file.readText())
+        transformed = ProtocolsParser.transform(file.readText())
         file.writeText(transformed)
     }
 }
