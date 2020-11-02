@@ -254,6 +254,11 @@ public class Math
     {
         return Double.random(in: 0 ..< 1)
     }
+
+    static func pow(_ number:Double, _ exponent:Double) -> Double
+    {
+        return Foundation.pow(number, exponent)
+    }
 }
 
 func sqrt(_ number:Double) -> Double

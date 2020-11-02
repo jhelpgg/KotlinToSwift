@@ -9,7 +9,7 @@ class GuardInterfaceLineParserTests
     fun parseGuard()
     {
         val guardInterfaceLineParser = GuardInterfaceLineParser()
-        assertEqualsIgnoreWhiteSpaceNumber("guard (age>=0) else  { throw CommonManagedExceptions.IllegalArgumentException(\"Age must be positive\") }",
+        assertEqualsIgnoreWhiteSpaceNumber("guard (age>=0) else  { throw IllegalArgumentException(\"Age must be positive\") }",
                                            guardInterfaceLineParser.parse("(age>=0).guard { throw IllegalArgumentException(\"Age must be positive\") }"))
     }
 }

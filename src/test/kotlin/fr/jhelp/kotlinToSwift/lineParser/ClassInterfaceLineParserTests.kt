@@ -27,7 +27,7 @@ class ClassInterfaceLineParserTests
     fun parseInterface()
     {
         val classInterfaceLineParser = ClassInterfaceLineParser()
-        Assertions.assertEquals("protocol Person",
+        Assertions.assertEquals("public protocol Person",
                                 classInterfaceLineParser.parse("interface Person"))
 
         Assertions.assertEquals("public protocol Person",

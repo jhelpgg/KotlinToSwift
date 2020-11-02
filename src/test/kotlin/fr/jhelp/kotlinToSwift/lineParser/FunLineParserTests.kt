@@ -19,7 +19,7 @@ class FunLineParserTests
                                            funLineParser.parse("@Throws private fun mayFail()"))
         assertEqualsIgnoreWhiteSpaceNumber("open public func test(_ task : @escaping  ()->Int)",
                                            funLineParser.parse("open public fun test(task : ()->Int)"))
-        assertEqualsIgnoreWhiteSpaceNumber("func next() -> Element<T>?",
+        assertEqualsIgnoreWhiteSpaceNumber("public func next() -> Element<T>?",
                                            funLineParser.parse("fun next(): Element<T>?"))
     }
 }
