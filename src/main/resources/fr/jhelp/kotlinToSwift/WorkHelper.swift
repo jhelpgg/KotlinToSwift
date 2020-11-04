@@ -288,6 +288,26 @@ public class Mutex
     }
 }
 
+public class Locker
+{
+    private let mutex : DispatchSemaphore
+
+    public init()
+    {
+        self.mutex = DispatchSemaphore(value : 0)
+    }
+
+    public func lock()
+    {
+        self.mutex.wait()
+    }
+
+    public func unlock()
+    {
+        self.mutex.signal()
+    }
+}
+
 public func timeSince1970InMilliseconds() -> Long
 {
     return Long(NSDate().timeIntervalSince1970 * 1000.0)
