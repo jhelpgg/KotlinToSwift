@@ -29,4 +29,6 @@ fun postTreatments(files: List<File>)
     }
 
     parseProtocolsInFiles(files)
+    removeOpen(files)
+    addHeaderClass(files)
 }

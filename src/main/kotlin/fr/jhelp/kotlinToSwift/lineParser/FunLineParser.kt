@@ -1,5 +1,6 @@
 package fr.jhelp.kotlinToSwift.lineParser
 
+import fr.jhelp.kotlinToSwift.KotlinToSwiftOptions
 import java.util.regex.Pattern
 
 /**
@@ -53,7 +54,7 @@ class FunLineParser : LineParser
                 declaration = declaration.substring(8).trim()
             }
 
-            if (!VISIBILITY_PATTERN.matcher(declaration).find() && !declaration.contains("open"))
+            if (KotlinToSwiftOptions.automaticPublic && !VISIBILITY_PATTERN.matcher(declaration).find() && !declaration.contains("open"))
             {
                 declaration = "public $declaration"
             }

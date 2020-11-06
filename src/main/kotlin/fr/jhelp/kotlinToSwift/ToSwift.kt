@@ -6,20 +6,22 @@ private class ToSwift
 
 fun main(args: Array<String>)
 {
-    if (args.size < 2)
+    val parameters = KotlinToSwiftOptions.extractOptions(args)
+
+    if (parameters.size < 2)
     {
         println("Need Kotlin source directory and Swift destination directory")
         return
     }
 
     //Init
-    val destination = File(args[args.size - 1])
+    val destination = File(parameters[parameters.size - 1])
     destination.deleteRecursively()
 
     //Transform code
-    for(sourceIndex in 0 until  args.size-1)
+    for (sourceIndex in 0 until parameters.size - 1)
     {
-        swiftTransformer(File(args[sourceIndex]), destination)
+        swiftTransformer(File(parameters[sourceIndex]), destination)
     }
 
     //Transfer prebuilt files

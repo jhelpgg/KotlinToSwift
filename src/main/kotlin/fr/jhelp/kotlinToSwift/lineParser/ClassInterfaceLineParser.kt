@@ -1,5 +1,6 @@
 package fr.jhelp.kotlinToSwift.lineParser
 
+import fr.jhelp.kotlinToSwift.KotlinToSwiftOptions
 import java.util.regex.Pattern
 
 /**
@@ -38,7 +39,10 @@ class ClassInterfaceLineParser : LineParser
             val parsed = StringBuilder()
 
             matcher.group(GROUP_CLASS_PUBLIC_INTERNAL)?.let { header -> parsed.append(header) }
-            ?: let { parsed.append("public ") }
+            ?: if (KotlinToSwiftOptions.automaticPublic)
+            {
+                parsed.append("public ")
+            }
             parsed.append(matcher.group(GROUP_CLASS_INTERFACE_DESCRIPTION).replace("interface", "protocol"))
             parsed.append(matcher.group(GROUP_CLASS_INTERFACE_NAME))
             matcher.group(GROUP_CLASS_INTERFACE_EXTENDS)?.let { parsed.append(it) }

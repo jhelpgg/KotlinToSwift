@@ -1,5 +1,6 @@
 package fr.jhelp.kotlinToSwift.lineParser
 
+import fr.jhelp.kotlinToSwift.KotlinToSwiftOptions
 import fr.jhelp.kotlinToSwift.endParenthesisIndex
 import java.util.regex.Pattern
 
@@ -39,7 +40,7 @@ class ConstructorLineParser : LineParser
         {
             parsed.append(matcher.group())
         }
-        else
+        else if(KotlinToSwiftOptions.automaticPublic)
         {
             parsed.append("public ")
         }

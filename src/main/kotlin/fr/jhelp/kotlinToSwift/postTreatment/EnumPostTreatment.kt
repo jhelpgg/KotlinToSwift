@@ -1,5 +1,6 @@
 package fr.jhelp.kotlinToSwift.postTreatment
 
+import fr.jhelp.kotlinToSwift.KotlinToSwiftOptions
 import java.util.regex.Pattern
 
 private val enumClassPattern = Pattern.compile("enum\\s+class\\s+([a-zA-Z0-9_]+)(\\s*)\\{")
@@ -18,7 +19,13 @@ fun parseEnumFile(file: String): String
 
     val transformed = StringBuilder()
     transformed.append(file.substring(0, matcher.start()))
-    transformed.append("public enum ")
+
+    if (KotlinToSwiftOptions.automaticPublic)
+    {
+        transformed.append("public ")
+    }
+
+    transformed.append("enum ")
     transformed.append(matcher.group(GROUP_NAME))
     transformed.append(matcher.group(GROUP_SPACE))
     transformed.append("{")
