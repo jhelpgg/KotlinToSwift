@@ -2,7 +2,7 @@ import Foundation
 
 public typealias Long = Int64
 
-public typealias Byte = Int8
+public typealias Byte = UInt8
 
 public extension String
 {
