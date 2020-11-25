@@ -111,14 +111,7 @@ public extension Int
 {
    func toByte() -> Byte
    {
-      let value = self & 0xFF
-
-      if(value > 0x7F)
-      {
-        return Byte(value - 0x100)
-      }
-
-      return Byte(value)
+      return Byte(self & 0xFF)
    }
 
    func toLong() -> Long
@@ -164,14 +157,7 @@ public extension Long
 {
    func toByte() -> Byte
    {
-      let value = self & 0xFF
-
-      if(value > 0x7F)
-      {
-        return Byte(value - 0x100)
-      }
-
-      return Byte(value)
+      return Byte(self & 0xFF)
    }
 
    func toInt() -> Int
@@ -286,6 +272,30 @@ public class Mutex
         task()
         self.mutex.signal()
     }
+
+
+    public func safeExecuteMayThrows(_ task: @escaping () throws -> Void) throws
+    {
+        self.mutex.wait()
+        var errorCollected : Error? = nil
+
+        do
+        {
+            try task()
+        }
+        catch
+        {
+          errorCollected = error
+        }
+
+        self.mutex.signal()
+
+        if errorCollected != nil
+        {
+            throw errorCollected!
+        }
+    }
+
 }
 
 public class Locker

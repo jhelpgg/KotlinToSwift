@@ -276,7 +276,7 @@ fun endParenthesisIndex(text: String, start: Int): Int
     return end
 }
 
-fun String.indexOfIgnoreCommentString(character:Char, startIndex : Int = 0) : Int
+fun String.indexOfIgnoreCommentString(character: Char, startIndex: Int = 0): Int
 {
     val characters = this.toCharArray()
     var insideString = false
@@ -286,12 +286,12 @@ fun String.indexOfIgnoreCommentString(character:Char, startIndex : Int = 0) : In
     var lineComment = false
     var multilineComment = false
 
-    for(index in  startIndex until characters.size)
+    for (index in startIndex until characters.size)
     {
-        when(characters[index])
+        when (characters[index])
         {
             character ->
-                if(!insideString && !escaped && !lineComment && !multilineComment)
+                if (!insideString && !escaped && !lineComment && !multilineComment)
                 {
                     return index
                 }
@@ -371,7 +371,7 @@ fun String.indexOfIgnoreCommentString(character:Char, startIndex : Int = 0) : In
                     mayMultiLineCommentEnd = false
                     mayCommentStart = false
                 }
-            else ->
+            else      ->
             {
                 escaped = false
                 mayMultiLineCommentEnd = false
@@ -381,4 +381,65 @@ fun String.indexOfIgnoreCommentString(character:Char, startIndex : Int = 0) : In
     }
 
     return -1
+}
+
+private const val CHAR_0 = 0.toChar()
+
+fun String.splitIgnoreOpenClose(delimiter: Char, vararg openClose: Pair<Char, Char>): List<String>
+{
+    val list = ArrayList<String>()
+    val characters = this.toCharArray()
+    var start = 0
+    var openCount = 0
+    var currentOpen = CHAR_0
+    var waitClose = CHAR_0
+
+    for ((index, character) in characters.withIndex())
+    {
+        if (waitClose == CHAR_0)
+        {
+            if (character == delimiter)
+            {
+                if (index > start)
+                {
+                    list.add(this.substring(start, index))
+                }
+
+                start = index + 1
+            }
+            else
+            {
+                for ((open, close) in openClose)
+                {
+                    if (character == open)
+                    {
+                        currentOpen = open
+                        openCount = 1
+                        waitClose = close
+                        break
+                    }
+                }
+            }
+        }
+        else if (character == waitClose)
+        {
+            openCount--
+
+            if (openCount <= 0)
+            {
+                waitClose = CHAR_0
+            }
+        }
+        else if (character == currentOpen)
+        {
+            openCount++
+        }
+    }
+
+    if (start < this.length)
+    {
+        list.add(this.substring(start))
+    }
+
+    return list
 }

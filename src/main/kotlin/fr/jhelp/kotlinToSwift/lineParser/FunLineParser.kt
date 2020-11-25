@@ -1,6 +1,7 @@
 package fr.jhelp.kotlinToSwift.lineParser
 
 import fr.jhelp.kotlinToSwift.KotlinToSwiftOptions
+import fr.jhelp.kotlinToSwift.splitIgnoreOpenClose
 import java.util.regex.Pattern
 
 /**
@@ -99,7 +100,7 @@ fun parseParameters(parameters: String, parsed: StringBuilder)
         return
     }
 
-    val parametersList = parametersTrim.split(",")
+    val parametersList = parametersTrim.splitIgnoreOpenClose(',', Pair('<', '>'))
     parseParameter(parametersList[0].trim(), parsed)
 
     (1 until parametersList.size).forEach { index ->
