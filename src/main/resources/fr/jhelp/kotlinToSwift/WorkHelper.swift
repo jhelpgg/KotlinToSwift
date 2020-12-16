@@ -27,6 +27,33 @@ public extension String
         return value!
     }
 
+    func toLong() throws -> Long
+    {
+        let value = Long(self)
+
+        guard value != nil else { throw GenericError("Can not convert \(self) to long") }
+
+        return value!
+    }
+
+    func toFloat() throws -> Float
+    {
+        let value = Float(self)
+
+        guard value != nil else { throw GenericError("Can not convert \(self) to float") }
+
+        return value!
+    }
+
+    func toDouble() throws -> Double
+    {
+        let value = Double(self)
+
+        guard value != nil else { throw GenericError("Can not convert \(self) to double") }
+
+        return value!
+    }
+
     func startsWith(_ start:String) -> Bool
     {
         return self.hasPrefix(start)
@@ -104,6 +131,33 @@ public extension String
         }
 
         return 0
+    }
+
+    func compareTo(_ other: String, _ ignoreCase:Boolean) -> Int
+    {
+        if(ignoreCase)
+        {
+            let comparison = self.caseInsensitiveCompare(other)
+
+            switch comparison
+            {
+                case ComparisonResult.orderedAscending : return -1
+            	case ComparisonResult.orderedSame : return 0
+            	case ComparisonResult.orderedDescending : return 1
+           	}
+        }
+
+        return self.compareTo(other)
+    }
+
+    func equals(_ other: String, _ ignoreCase:Boolean) -> Boolean
+    {
+        return self.compareTo(other, ignoreCase) == 0
+    }
+
+    func trim() -> String
+    {
+        return self.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
 
