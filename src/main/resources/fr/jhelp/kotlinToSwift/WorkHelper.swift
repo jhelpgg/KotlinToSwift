@@ -133,7 +133,7 @@ public extension String
         return 0
     }
 
-    func compareTo(_ other: String, _ ignoreCase:Boolean) -> Int
+    func compareTo(_ other: String, _ ignoreCase:Bool) -> Int
     {
         if(ignoreCase)
         {
@@ -150,7 +150,7 @@ public extension String
         return self.compareTo(other)
     }
 
-    func equals(_ other: String, _ ignoreCase:Boolean) -> Boolean
+    func equals(_ other: String, _ ignoreCase:Bool) -> Bool
     {
         return self.compareTo(other, ignoreCase) == 0
     }
