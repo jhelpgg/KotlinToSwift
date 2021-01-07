@@ -381,3 +381,8 @@ public func fatal<T>(_ message:String) -> T
 {
    fatalError(message)
 }
+
+public func createDispatchQueue(_ name:String) -> DispatchQueue
+{
+    return DispatchQueue(label: name, attributes: .concurrent)
+}

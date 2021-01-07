@@ -4,6 +4,8 @@ import java.io.File
 
 private class ToSwift
 
+// @discardableResult
+
 fun main(args: Array<String>)
 {
     val parameters = KotlinToSwiftOptions.extractOptions(args)
