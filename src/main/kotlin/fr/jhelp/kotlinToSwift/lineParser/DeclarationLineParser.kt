@@ -9,8 +9,8 @@ private const val GROUP_DECLARATION_TRY = 2
 private const val GROUP_DECLARATION_VALR = 3
 private const val GROUP_DECLARATION_NAME = 4
 private const val GROUP_DECLARATION_SPECIFICATION = 5
-private const val PRIVATE_SET = "private set"
-private const val INTERNAL_SET = "internal set"
+const val PRIVATE_SET = "private set"
+const val INTERNAL_SET = "internal set"
 
 class DeclarationLineParser : LineParser
 {
