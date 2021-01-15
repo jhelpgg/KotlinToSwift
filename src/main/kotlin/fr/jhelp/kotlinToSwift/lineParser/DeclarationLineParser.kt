@@ -3,7 +3,7 @@ package fr.jhelp.kotlinToSwift.lineParser
 import java.util.regex.Pattern
 
 private val PATTERN_DECLARATION =
-    Pattern.compile("((?:private|internal|public)\\s+)?((?:@T|t)ry\\s+)?(va[rl]\\s+)([a-zA-Z][a-zA-Z0-9_]*)(.*)")
+    Pattern.compile("((?:private|internal|public)\\s+)?((?:@T|t)ry\\s+)?(?:const\\s+)?(va[rl]\\s+)([a-zA-Z][a-zA-Z0-9_]*)(.*)")
 private const val GROUP_DECLARATION_PRIVATE = 1
 private const val GROUP_DECLARATION_TRY = 2
 private const val GROUP_DECLARATION_VALR = 3
