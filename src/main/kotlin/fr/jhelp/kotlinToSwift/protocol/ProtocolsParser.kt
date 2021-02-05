@@ -1,7 +1,10 @@
 package fr.jhelp.kotlinToSwift.protocol
 
 import java.io.File
-import java.util.*
+import java.util.ArrayList
+import java.util.HashMap
+import java.util.Stack
+import java.util.TreeSet
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -23,9 +26,12 @@ val GROUP_GENERIC_NAME = 2
 val GROUP_GENERIC_ENDING = 3
 val METHOD_DESCRIPTION = Pattern.compile("func\\s*([a-zA-Z][a-zA-Z0-9_]*)\\s*\\(")
 val GROUP_METHOD_NAME = 1
-val METHOD_OVERRIDE_DESCRIPTION = Pattern.compile("override\\s+func\\s*([a-zA-Z][a-zA-Z0-9_]*)\\s*\\(")
+val METHOD_OVERRIDE_DESCRIPTION = Pattern.compile("((?:internal|public)\\s+)?override\\s+func\\s*([a-zA-Z][a-zA-Z0-9_]*)\\s*\\(")
+const val GROUP_OVERRIDE_INTERNAL_PUBLIC = 1
+const val GROUP_OVERRIDE_METHOD_NAME = 2
+val PUBLIC_FUN = Pattern.compile("public\\s+fun")
 
-class ProtocolsParser
+object ProtocolsParser
 {
     val protocols = HashMap<String, Protocol>()
 
@@ -112,7 +118,8 @@ class ProtocolsParser
                     }
                 }
             }
-        } while (changed)
+        }
+        while (changed)
     }
 
     fun transform(file: String): String
@@ -224,7 +231,8 @@ class ProtocolsParser
 
                     transformed.append(matcherGenericName.group(GROUP_GENERIC_SEPARATOR))
                     genericName = matcherGenericName.group(GROUP_GENERIC_NAME)
-                    transformed.append(currentProtocol.generics[genericName]?.replaceName ?: genericName)
+                    transformed.append(currentProtocol.generics[genericName]?.replaceName
+                                       ?: genericName)
                     matcherGenericName.group(GROUP_GENERIC_ENDING)?.let { transformed.append(it) }
                     end = matcherGenericName.end() + more
                 }
@@ -234,7 +242,7 @@ class ProtocolsParser
                 protocolsTypes.forEach { (protocol, types) ->
                     for (index in 0 until protocol.size)
                     {
-                        transformed.append("     typealias ${protocol[index].replaceName} = ${types[index]}\n")
+                        transformed.append("     public typealias ${protocol[index].replaceName} = ${types[index]}\n")
                     }
                 }
             }
@@ -247,12 +255,19 @@ class ProtocolsParser
             transformed.append(file.substring(start))
         }
 
-        val toClear = transformed.toString()
+        val toClear = if (isProtocol)
+        {
+            PUBLIC_FUN.matcher(transformed.toString()).replaceAll("fun")
+        }
+        else
+        {
+            transformed.toString()
+        }
 
-//        if (isProtocol)
-//        {
-//            return toClear.replace("func ", "mutating func ")
-//        }
+        //        if (isProtocol)
+        //        {
+        //            return toClear.replace("func ", "mutating func ")
+        //        }
 
         transformed = StringBuilder()
         val length = toClear.length
@@ -261,22 +276,22 @@ class ProtocolsParser
         val protocolsTreated = TreeSet<String>()
         val methodsName = TreeSet<String>()
         val stack = Stack<Protocol>()
-        var prot:Protocol
+        var prot: Protocol
 
         protocolsTypes.forEach { (protocol, _) -> stack.push(protocol) }
 
-        while(stack.isNotEmpty())
+        while (stack.isNotEmpty())
         {
             prot = stack.pop()
 
-            if(protocolsTreated.add(prot.name))
+            if (protocolsTreated.add(prot.name))
             {
                 methodsName.addAll(prot.methodsName)
 
-                prot.generics.forEach { (_ , generic) ->
+                prot.generics.forEach { (_, generic) ->
                     val from = generic.fromProtocol
 
-                    if(from!=null && from !in protocolsTreated)
+                    if (from != null && from !in protocolsTreated)
                     {
                         stack.push(this.protocols[from])
                     }
@@ -295,7 +310,9 @@ class ProtocolsParser
                 transformed.append(toClear.substring(start, end))
             }
 
-            methodName = matcher.group(GROUP_METHOD_NAME)
+            matcher.group(GROUP_OVERRIDE_INTERNAL_PUBLIC)?.let { header -> transformed.append(header) }
+
+            methodName = matcher.group(GROUP_OVERRIDE_METHOD_NAME)
 
             if (methodName in methodsName)
             {
@@ -323,13 +340,12 @@ class ProtocolsParser
 
 fun parseProtocolsInFiles(files: List<File>)
 {
-    val protocolsParser = ProtocolsParser()
-    files.forEach { protocolsParser.addFile(it.readText()) }
-    protocolsParser.compile()
+    files.forEach { ProtocolsParser.addFile(it.readText()) }
+    ProtocolsParser.compile()
     var transformed: String
 
     files.forEach { file ->
-        transformed = protocolsParser.transform(file.readText())
+        transformed = ProtocolsParser.transform(file.readText())
         file.writeText(transformed)
     }
 }

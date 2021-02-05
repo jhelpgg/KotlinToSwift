@@ -1,8 +1,10 @@
 package fr.jhelp.kotlinToSwift
 
+import fr.jhelp.kotlinToSwift.lineParser.FORCE_LINE_CONTINUE
+import fr.jhelp.kotlinToSwift.lineParser.INTERNAL_SET
+import fr.jhelp.kotlinToSwift.lineParser.PRIVATE_SET
 import fr.jhelp.kotlinToSwift.lineParser.parseLine
 import fr.jhelp.kotlinToSwift.postTreatment.postTreatments
-import fr.jhelp.kotlinToSwift.protocol.parseProtocolsInFiles
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
@@ -102,21 +104,31 @@ private fun internalSwiftTransformer(source: File, destination: File)
         swiftWriter = BufferedWriter(OutputStreamWriter(FileOutputStream(destination)))
         println("${source.absolutePath} -> ${destination.absolutePath}")
         var line = kotlinReader.readLine()
+        var lineAfter: String? = null
+        var lineAfterTrimmed: String? = null
         var inMultilineComment = false
 
         while (line != null)
         {
             line = previous + line
             previous = ""
+            lineAfter = kotlinReader.readLine()
+            lineAfterTrimmed = lineAfter?.trim()
+
+            if (PRIVATE_SET == lineAfterTrimmed || INTERNAL_SET == lineAfterTrimmed)
+            {
+                line += " $lineAfter"
+                lineAfter = kotlinReader.readLine()
+            }
 
             when (parserLine(line, swiftWriter, inMultilineComment))
             {
                 ParseStatus.MULTI_LINE_COMMENT -> inMultilineComment = true
-                ParseStatus.PARSED -> inMultilineComment = false
-                ParseStatus.LINE_CONTINUE -> previous = line + "\n"
+                ParseStatus.PARSED             -> inMultilineComment = false
+                ParseStatus.LINE_CONTINUE      -> previous = line + "\n"
             }
 
-            line = kotlinReader.readLine()
+            line = lineAfter
         }
 
         swiftWriter.flush()
@@ -193,7 +205,13 @@ private fun parserLine(line: String, swiftWriter: BufferedWriter, inMultilineCom
 
     val keyWordsReplaced = keyWordReplacement(trimLine)
     val stringInterpreted = stringInterpret(keyWordsReplaced)
+
     val transformed = parseLine(stringInterpreted)
+
+    if (transformed == FORCE_LINE_CONTINUE)
+    {
+        return ParseStatus.LINE_CONTINUE
+    }
 
     if (transformed.isNotEmpty())
     {
@@ -203,6 +221,13 @@ private fun parserLine(line: String, swiftWriter: BufferedWriter, inMultilineCom
         }
 
         swiftWriter.write(transformed)
+        swiftWriter.newLine()
+        return ParseStatus.PARSED
+    }
+
+    if (stringInterpreted.contains("@Test"))
+    {
+        swiftWriter.write(stringInterpreted)
         swiftWriter.newLine()
         return ParseStatus.PARSED
     }
@@ -241,7 +266,7 @@ fun countParenthesis(string: String): Int
         when (character)
         {
             '\\' -> escaped = !escaped
-            '"' ->
+            '"'  ->
                 when
                 {
                     escaped      -> escaped = false
@@ -253,13 +278,13 @@ fun countParenthesis(string: String): Int
                     escaped       -> escaped = false
                     !insideString -> insideQuote = !insideQuote
                 }
-            '(' ->
+            '('  ->
                 when
                 {
                     escaped                       -> escaped = false
                     !insideString && !insideQuote -> count++
                 }
-            ')' ->
+            ')'  ->
                 when
                 {
                     escaped                       -> escaped = false

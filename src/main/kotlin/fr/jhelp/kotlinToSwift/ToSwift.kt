@@ -4,24 +4,33 @@ import java.io.File
 
 private class ToSwift
 
+// @discardableResult
+
 fun main(args: Array<String>)
 {
-    if (args.size < 2)
+    val parameters = KotlinToSwiftOptions.extractOptions(args)
+
+    if (parameters.size < 2)
     {
         println("Need Kotlin source directory and Swift destination directory")
         return
     }
 
     //Init
-    val source = File(args[0])
-    val destination = File(args[1])
+    val destination = File(parameters[parameters.size - 1])
     destination.deleteRecursively()
 
     //Transform code
-    swiftTransformer(source, destination)
+    for (sourceIndex in 0 until parameters.size - 1)
+    {
+        swiftTransformer(File(parameters[sourceIndex]), destination)
+    }
 
     //Transfer prebuilt files
     transferResource("WorkHelper.swift", destination)
+    transferResource("TimeCalendar.swift", destination)
+    transferResource("Pair.swift", destination)
+    transferResource("GenericError.swift", destination)
 }
 
 private fun transferResource(resourceName: String, destination: File)

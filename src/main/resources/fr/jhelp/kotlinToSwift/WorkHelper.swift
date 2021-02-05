@@ -1,10 +1,10 @@
-import Dispatch
+import Foundation
 
-typealias Long = Int64
+public typealias Long = Int64
 
-typealias Byte = Int8
+public typealias Byte = UInt8
 
-extension String
+public extension String
 {
     var length : Int { get { return self.count } }
 
@@ -18,9 +18,40 @@ extension String
        return !self.isEmpty
     }
 
-    func toInt() -> Int
+    func toInt() throws -> Int
     {
-        return Int(self) ?? 0
+        let value = Int(self)
+
+        guard value != nil else { throw GenericError("Can not convert \(self) to integer") }
+
+        return value!
+    }
+
+    func toLong() throws -> Long
+    {
+        let value = Long(self)
+
+        guard value != nil else { throw GenericError("Can not convert \(self) to long") }
+
+        return value!
+    }
+
+    func toFloat() throws -> Float
+    {
+        let value = Float(self)
+
+        guard value != nil else { throw GenericError("Can not convert \(self) to float") }
+
+        return value!
+    }
+
+    func toDouble() throws -> Double
+    {
+        let value = Double(self)
+
+        guard value != nil else { throw GenericError("Can not convert \(self) to double") }
+
+        return value!
     }
 
     func startsWith(_ start:String) -> Bool
@@ -86,10 +117,57 @@ extension String
     {
         return String(self[String.Index(encodedOffset:start) ..< String.Index(encodedOffset:end)])
     }
+
+    func compareTo(_ other: String) -> Int
+    {
+        if(self < other)
+        {
+            return -1
+        }
+
+        if(self > other)
+        {
+            return 1
+        }
+
+        return 0
+    }
+
+    func compareTo(_ other: String, _ ignoreCase:Bool) -> Int
+    {
+        if(ignoreCase)
+        {
+            let comparison = self.caseInsensitiveCompare(other)
+
+            switch comparison
+            {
+                case ComparisonResult.orderedAscending : return -1
+            	case ComparisonResult.orderedSame : return 0
+            	case ComparisonResult.orderedDescending : return 1
+           	}
+        }
+
+        return self.compareTo(other)
+    }
+
+    func equals(_ other: String, _ ignoreCase:Bool) -> Bool
+    {
+        return self.compareTo(other, ignoreCase) == 0
+    }
+
+    func trim() -> String
+    {
+        return self.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 }
 
-extension Int
+public extension Int
 {
+   func toByte() -> Byte
+   {
+      return Byte(self & 0xFF)
+   }
+
    func toLong() -> Long
    {
        return Long(self)
@@ -106,7 +184,7 @@ extension Int
    }
 }
 
-extension Byte
+public extension Byte
 {
    func toInt() -> Int
    {
@@ -129,11 +207,23 @@ extension Byte
    }
 }
 
-extension Long
+public extension Long
 {
+   func toByte() -> Byte
+   {
+      return Byte(self & 0xFF)
+   }
+
    func toInt() -> Int
    {
-       return Int(self)
+      let value = self & Long(0xFFFFFFFF)
+
+      if(value > Long(0x7F000000))
+      {
+        return Int(value - Long(0x100000000))
+      }
+
+      return Int(value)
    }
 
    func toFloat() -> Float
@@ -147,7 +237,26 @@ extension Long
    }
 }
 
-extension Double
+public extension Float
+{
+   func toInt() -> Int
+   {
+       return Int(self)
+   }
+
+   func toLong() -> Long
+   {
+       return Long(self)
+   }
+
+   func toDouble() -> Double
+   {
+       return Double(self)
+   }
+}
+
+
+public extension Double
 {
    static var POSITIVE_INFINITY : Double { get {  return 1.0 / 0.0} }
    static var NEGATIVE_INFINITY : Double { get {  return -1.0 / 0.0} }
@@ -168,7 +277,7 @@ extension Double
    }
 }
 
-extension Array
+public extension Array
 {
     func firstOrNull(_ filter:(Element)->Bool) -> Element?
     {
@@ -176,21 +285,30 @@ extension Array
     }
 }
 
-class Math
+public class Math
 {
+    static let PI : Double = 3.14159265358979323846
+    static let E : Double = 2.7182818284590452354
+
     static func random() -> Double
     {
         return Double.random(in: 0 ..< 1)
     }
+
+    static func pow(_ number:Double, _ exponent:Double) -> Double
+    {
+        return Foundation.pow(number, exponent)
+    }
 }
 
-enum CommonManagedExceptions : Error
+func sqrt(_ number:Double) -> Double
 {
-    case Exception(_ message:String)
-    case IllegalArgumentException(_ message:String)
-    case IllegalStateException(_ message:String)
-    case RuntimeException(_ message:String)
-    case NullPointerException(_ message:String)
+     return number.squareRoot()
+}
+
+func sqrt(_ number:Float) -> Float
+{
+     return number.squareRoot()
 }
 
 public class Mutex
@@ -208,4 +326,63 @@ public class Mutex
         task()
         self.mutex.signal()
     }
+
+
+    public func safeExecuteMayThrows(_ task: @escaping () throws -> Void) throws
+    {
+        self.mutex.wait()
+        var errorCollected : Error? = nil
+
+        do
+        {
+            try task()
+        }
+        catch
+        {
+          errorCollected = error
+        }
+
+        self.mutex.signal()
+
+        if errorCollected != nil
+        {
+            throw errorCollected!
+        }
+    }
+
+}
+
+public class Locker
+{
+    private let mutex : DispatchSemaphore
+
+    public init()
+    {
+        self.mutex = DispatchSemaphore(value : 0)
+    }
+
+    public func lock()
+    {
+        self.mutex.wait()
+    }
+
+    public func unlock()
+    {
+        self.mutex.signal()
+    }
+}
+
+public func timeSince1970InMilliseconds() -> Long
+{
+    return Long(NSDate().timeIntervalSince1970 * 1000.0)
+}
+
+public func fatal<T>(_ message:String) -> T
+{
+   fatalError(message)
+}
+
+public func createDispatchQueue(_ name:String) -> DispatchQueue
+{
+    return DispatchQueue(label: name, attributes: .concurrent)
 }

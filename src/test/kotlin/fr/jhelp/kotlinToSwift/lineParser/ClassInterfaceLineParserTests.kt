@@ -1,5 +1,6 @@
 package fr.jhelp.kotlinToSwift.lineParser
 
+import fr.jhelp.kotlinToSwift.test.tools.assertEqualsIgnoreWhiteSpaceNumber
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -9,16 +10,16 @@ class ClassInterfaceLineParserTests
     fun parseClass()
     {
         val classInterfaceLineParser = ClassInterfaceLineParser()
-        Assertions.assertEquals("public class Person",
+        assertEqualsIgnoreWhiteSpaceNumber("public class Person",
                                 classInterfaceLineParser.parse("public class Person"))
 
-        Assertions.assertEquals("internal class Car : Engine",
+        assertEqualsIgnoreWhiteSpaceNumber("internal class Car : Engine",
                                 classInterfaceLineParser.parse("internal class Car : Engine"))
 
-        Assertions.assertEquals("internal class Car : Engine, Comparable {",
+        assertEqualsIgnoreWhiteSpaceNumber("internal class Car : Engine, Comparable {",
                                 classInterfaceLineParser.parse("internal class Car : Engine, Comparable {"))
 
-        Assertions.assertEquals("internal class Map<R> {",
+        assertEqualsIgnoreWhiteSpaceNumber("internal class Map<R> {",
                                 classInterfaceLineParser.parse("internal class Map<R> {"))
     }
 
@@ -26,7 +27,7 @@ class ClassInterfaceLineParserTests
     fun parseInterface()
     {
         val classInterfaceLineParser = ClassInterfaceLineParser()
-        Assertions.assertEquals("protocol Person",
+        Assertions.assertEquals("public protocol Person",
                                 classInterfaceLineParser.parse("interface Person"))
 
         Assertions.assertEquals("public protocol Person",

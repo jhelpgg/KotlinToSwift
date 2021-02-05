@@ -16,18 +16,21 @@ interface LineParser
 
 /** Parsers to test. WARNING : Order is important since first match win*/
 val PARSERS: Array<LineParser> =
-        arrayOf(ClassInterfaceLineParser(),
-                ConstructorLineParser(),
-                DeclarationLineParser(),
-                FunLineParser(),
-                GuardInterfaceLineParser(),
-                TryLineParser(),
-                AnnotationLineParser(),
-                CatchLineParser(),
-                IfForWhileLineParser(),
-                ImportSwiftLineParser(),
-                ClosureLambdaLineParser(),
-                AsIsLineParser())
+    arrayOf(ClassInterfaceLineParser(),
+            ConstructorLineParser(),
+            DeclarationLineParser(),
+            FunLineParser(),
+            GuardInterfaceLineParser(),
+            TryLineParser(),
+            AnnotationLineParser(),
+            CatchLineParser(),
+            IfForWhileLineParser(),
+            ImportSwiftLineParser(),
+            ClosureLambdaLineParser(),
+            AsIsLineParser(),
+            IgnoredAnnotationsParser())
+
+const val FORCE_LINE_CONTINUE = "$@<([FORCE_LINE_CONTINUE])>@$"
 
 /**
  * Convenient method for parse (Use parsers in good order)
