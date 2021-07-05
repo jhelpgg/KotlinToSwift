@@ -34,7 +34,7 @@ fun endCurlyIndex(text: String, start: Int): Int
                 mayMultiLineCommentEnd = false
                 mayCommentStart = false
             }
-            '"' ->
+            '"'  ->
                 if (!lineComment && !multilineComment)
                 {
                     if (!escaped)
@@ -46,7 +46,7 @@ fun endCurlyIndex(text: String, start: Int): Int
                     mayMultiLineCommentEnd = false
                     mayCommentStart = false
                 }
-            '{' ->
+            '{'  ->
                 if (!lineComment && !multilineComment)
                 {
                     if (!escaped && !insideString)
@@ -58,7 +58,7 @@ fun endCurlyIndex(text: String, start: Int): Int
                     mayMultiLineCommentEnd = false
                     mayCommentStart = false
                 }
-            '}' ->
+            '}'  ->
                 if (!lineComment && !multilineComment)
                 {
                     if (!escaped && !insideString)
@@ -70,7 +70,7 @@ fun endCurlyIndex(text: String, start: Int): Int
                     mayMultiLineCommentEnd = false
                     mayCommentStart = false
                 }
-            '/' ->
+            '/'  ->
                 if (!lineComment && !multilineComment)
                 {
                     if (!escaped && !insideString)
@@ -105,7 +105,7 @@ fun endCurlyIndex(text: String, start: Int): Int
                 mayMultiLineCommentEnd = false
                 mayCommentStart = false
             }
-            '*' ->
+            '*'  ->
                 if (!escaped && !insideString)
                 {
                     if (mayCommentStart)
@@ -172,7 +172,7 @@ fun endParenthesisIndex(text: String, start: Int): Int
                 mayMultiLineCommentEnd = false
                 mayCommentStart = false
             }
-            '"' ->
+            '"'  ->
                 if (!lineComment && !multilineComment)
                 {
                     if (!escaped)
@@ -184,7 +184,7 @@ fun endParenthesisIndex(text: String, start: Int): Int
                     mayMultiLineCommentEnd = false
                     mayCommentStart = false
                 }
-            '(' ->
+            '('  ->
                 if (!lineComment && !multilineComment)
                 {
                     if (!escaped && !insideString)
@@ -196,7 +196,7 @@ fun endParenthesisIndex(text: String, start: Int): Int
                     mayMultiLineCommentEnd = false
                     mayCommentStart = false
                 }
-            ')' ->
+            ')'  ->
                 if (!lineComment && !multilineComment)
                 {
                     if (!escaped && !insideString)
@@ -208,7 +208,7 @@ fun endParenthesisIndex(text: String, start: Int): Int
                     mayMultiLineCommentEnd = false
                     mayCommentStart = false
                 }
-            '/' ->
+            '/'  ->
                 if (!lineComment && !multilineComment)
                 {
                     if (!escaped && !insideString)
@@ -243,7 +243,7 @@ fun endParenthesisIndex(text: String, start: Int): Int
                 mayMultiLineCommentEnd = false
                 mayCommentStart = false
             }
-            '*' ->
+            '*'  ->
                 if (!escaped && !insideString)
                 {
                     if (mayCommentStart)
@@ -295,7 +295,7 @@ fun String.indexOfIgnoreCommentString(character: Char, startIndex: Int = 0): Int
                 {
                     return index
                 }
-            '\\' ->
+            '\\'      ->
             {
                 if (!lineComment && !multilineComment)
                 {
@@ -305,7 +305,7 @@ fun String.indexOfIgnoreCommentString(character: Char, startIndex: Int = 0): Int
                 mayMultiLineCommentEnd = false
                 mayCommentStart = false
             }
-            '"' ->
+            '"'       ->
                 if (!lineComment && !multilineComment)
                 {
                     if (!escaped)
@@ -317,7 +317,7 @@ fun String.indexOfIgnoreCommentString(character: Char, startIndex: Int = 0): Int
                     mayMultiLineCommentEnd = false
                     mayCommentStart = false
                 }
-            '/' ->
+            '/'       ->
                 if (!lineComment && !multilineComment)
                 {
                     if (!escaped && !insideString)
@@ -345,14 +345,14 @@ fun String.indexOfIgnoreCommentString(character: Char, startIndex: Int = 0): Int
                     mayMultiLineCommentEnd = false
                     multilineComment = false
                 }
-            '\n' ->
+            '\n'      ->
             {
                 lineComment = false
                 escaped = false
                 mayMultiLineCommentEnd = false
                 mayCommentStart = false
             }
-            '*' ->
+            '*'       ->
                 if (!escaped && !insideString)
                 {
                     if (mayCommentStart)

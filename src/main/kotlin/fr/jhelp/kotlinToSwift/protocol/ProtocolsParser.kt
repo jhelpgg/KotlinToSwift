@@ -7,13 +7,13 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 val PROTOCOL = Pattern.compile(
-    "protocol\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(<[a-zA-Z0-9_, ]+>)?\\s*(:\\s*[a-zA-Z0-9_,<> ]+)?\\s*\\{")
+    "protocol\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(<[a-zA-Z0-9_, :]+>)?\\s*(:\\s*[a-zA-Z0-9_,<> ]+)?\\s*\\{")
 val GROUP_NAME = 1
 val GROUP_PROTOCOL_GENERICS = 2
 val GROUP_IMPLEMENTED_PROTOCOLS = 3
 val PROTOCOL_IMPLEMENTS = Pattern.compile("([a-zA-Z][a-zA-Z0-9_]*)\\s*(<[a-zA-Z0-9_, ]+>)?")
 val PROTOCOL_OR_CLASS = Pattern.compile(
-    "(protocol|class)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(<[a-zA-Z0-9_, ]+>)?\\s*(:\\s*[a-zA-Z0-9_,<> ]+)?\\s*\\{")
+    "(protocol|class)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(<[a-zA-Z0-9_, :]+>)?\\s*(:\\s*[a-zA-Z0-9_,<> ]+)?\\s*\\{")
 val GROUP_PROTOCOL_OR_CLASS = 1
 val GROUP_PROTOCOL_OR_CLASS_NAME = 2
 val GROUP_PROTOCOL_OR_CLASS_GENERICS = 3
@@ -65,7 +65,17 @@ object ProtocolsParser
             generics?.substring(1, generics.length - 1)
                 ?.split(',')
                 ?.forEach { genericName ->
-                    val trim = genericName.trim()
+                    var trim = genericName.trim()
+                    val indexColon = trim.indexOf(':')
+                    val extended : String
+
+                    if(indexColon>=0) {
+                        extended = trim.substring(indexColon)
+                        trim = trim.substring(0,indexColon).trim()
+                    } else {
+                        extended = ""
+                    }
+
                     val replaceName =
                         if (trim.length > 3)
                         {
@@ -76,7 +86,7 @@ object ProtocolsParser
                             "${name}_$trim"
                         }
 
-                    protocol.generics[trim] = Generic(index, genericName, replaceName)
+                    protocol.generics[trim] = Generic(index, trim, replaceName, extended)
                     index++
                 }
 
@@ -228,7 +238,7 @@ object ProtocolsParser
                 currentProtocol.generics.values.forEach { generic ->
                     if (generic.fromProtocol == null)
                     {
-                        transformed.append("     associatedtype ${generic.replaceName}\n")
+                        transformed.append("     associatedtype ${generic.replaceName}${generic.extended}\n")
                     }
                 }
 
