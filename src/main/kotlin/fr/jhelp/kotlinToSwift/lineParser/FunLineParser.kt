@@ -27,7 +27,7 @@ import java.util.regex.Pattern
  *      +-------------------------------------------------+----+----------------------------------------------------------+
  */
 private val FUNCTION_PATTERN =
-    Pattern.compile("(?:(@Throws)\\s+)?((?:(?:override|private|public|internal|open)\\s+)*fun)(\\s+<[a-zA-Z0-9_, :<>]+>)?(\\s+[a-zA-Z][a-zA-Z0-9_.]*\\s*)\\(((?:.|\\n)*)\\)(?:\\s*:\\s*([a-zA-Z][a-zA-Z0-9_<>?, ]*))?(\\s*\\{)?")
+    Pattern.compile("(?:(@Throws)\\s+)?((?:(?:override|private|public|internal|open)\\s+)*fun)(\\s+<[a-zA-Z0-9_, :<>]+>)?(\\s+[a-zA-Z][a-zA-Z0-9_<>.]*\\s*)\\(((?:.|\\n)*)\\)(?:\\s*:\\s*([a-zA-Z][a-zA-Z0-9_<>?, ]*))?(\\s*\\{)?")
 private const val GROUP_FUN_THROW = 1
 private const val GROUP_FUN_DECLARATION = 2
 private const val GROUP_FUN_GENERIC = 3
