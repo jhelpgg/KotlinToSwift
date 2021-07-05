@@ -27,7 +27,7 @@ import java.util.regex.Pattern
  *      +-------------------------------------------------+----+----------------------------------------------------------+
  */
 private val FUNCTION_PATTERN =
-    Pattern.compile("(?:(@Throws)\\s+)?((?:(?:override|private|public|internal|open)\\s+)*fun)(\\s+<[a-zA-Z0-9_, :<>]+>)?(\\s+[a-zA-Z][a-zA-Z0-9_]*\\s*)\\(((?:.|\\n)*)\\)(?:\\s*:\\s*([a-zA-Z][a-zA-Z0-9_<>?, ]*))?(\\s*\\{)?")
+    Pattern.compile("(?:(@Throws)\\s+)?((?:(?:override|private|public|internal|open)\\s+)*fun)(\\s+<[a-zA-Z0-9_, :<>]+>)?(\\s+[a-zA-Z][a-zA-Z0-9_.]*\\s*)\\(((?:.|\\n)*)\\)(?:\\s*:\\s*([a-zA-Z][a-zA-Z0-9_<>?, ]*))?(\\s*\\{)?")
 private const val GROUP_FUN_THROW = 1
 private const val GROUP_FUN_DECLARATION = 2
 private const val GROUP_FUN_GENERIC = 3
@@ -47,7 +47,25 @@ class FunLineParser : LineParser
         if (matcherFun.matches())
         {
             val parsed = StringBuilder()
-            val name = matcherFun.group(GROUP_FUN_NAME)
+            var name = matcherFun.group(GROUP_FUN_NAME)
+
+            val indexPoint = name.lastIndexOf('.')
+
+            if (indexPoint >= 0)
+            {
+                val indexSpace = name.lastIndexOf(' ', indexPoint)
+
+                name =
+                    if (indexSpace >= 0)
+                    {
+                        name.substring(0, indexSpace + 1) + name.substring(indexPoint + 1)
+                    }
+                    else
+                    {
+                        name.substring(indexPoint + 1)
+                    }
+            }
+
             var declaration = matcherFun.group(GROUP_FUN_DECLARATION)
 
             if (name.trim() in REMOVE_OVERRIDE_OF && declaration.startsWith("override"))

@@ -22,6 +22,7 @@ fun postTreatments(files: List<File>)
         transformed = parseEqualsInFile(transformed)
         transformed = parseComparableInFile(transformed)
         transformed = parseToStringInFile(transformed)
+        transformed = parseExtension(transformed)
 
         transformed = INTERNAL_OPEN_PATTERN.matcher(transformed).replaceAll(INTERNAL_OPEN_REPLACEMENT)
 
