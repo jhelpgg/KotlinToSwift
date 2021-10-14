@@ -104,7 +104,7 @@ fun internalSwiftTransformer(source: File, destination: File)
         println("${source.absolutePath} -> ${destination.absolutePath}")
         var line = kotlinReader.readLine()
         var lineAfter: String?
-        var lineAfterTrimmed: String? 
+        var lineAfterTrimmed: String?
         var inMultilineComment = false
 
         while (line != null)
