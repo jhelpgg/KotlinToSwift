@@ -36,6 +36,7 @@ private val KEY_WORDS_REPLACEMENT = arrayOf(
     Pair(Pattern.compile("([^a-zA-Z0-9_\"(][0-9]+(?:\\.[0-9]+)?)[fF]([^a-zA-Z0-9_\"]|$)"), " Float($1)$2"),
     Pair(Pattern.compile("\\((\\s*[a-zA-Z0-9_]+\\s+)!is(\\s+[a-zA-Z0-9_]+\\s*)\\)"), "!($1is$2)"),
     Pair(Pattern.compile("([a-zA-Z0-9_]+\\s+)!is(\\s+[a-zA-Z0-9_]+)"), "!($1is$2)"),
+    Pair(Pattern.compile("return@[a-zA-Z0-9_]+"), "return")
 )
 
 fun keyWordReplacement(string: String): String

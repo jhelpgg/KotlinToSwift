@@ -37,6 +37,7 @@ private const val GROUP_FUN_RETURN_TYPE = 6
 private const val GROUP_FUN_END_CURLY = 7
 private val VISIBILITY_PATTERN = Pattern.compile("private|public|internal")
 private val REMOVE_OVERRIDE_OF = arrayOf("toString")
+private const val ESCAPING = "@Escaping"
 
 class FunLineParser : LineParser
 {
@@ -129,17 +130,38 @@ fun parseParameters(parameters: String, parsed: StringBuilder)
 
 fun parseParameter(parameter: String, parsed: StringBuilder)
 {
+    var hasEscaping = false
+    val parameterClean =
+        if (parameter.startsWith(ESCAPING))
+        {
+            hasEscaping = true
+            parameter.substring(ESCAPING.length).trim()
+        }
+        else
+        {
+            parameter
+        }
+
     parsed.append("_ ")
 
-    if (parameter.contains("->"))
+    if (parameterClean.contains("->"))
     {
-        val index = parameter.indexOf(':')
-        parsed.append(parameter.substring(0, index + 1))
-        parsed.append(" @escaping ")
-        parsed.append(parameter.substring(index + 1))
+        val index = parameterClean.indexOf(':')
+        parsed.append(parameterClean.substring(0, index + 1))
+
+        if (hasEscaping)
+        {
+            parsed.append(" @escaping ")
+        }
+        else
+        {
+            parsed.append(' ')
+        }
+
+        parsed.append(parameterClean.substring(index + 1))
     }
     else
     {
-        parsed.append(parameter)
+        parsed.append(parameterClean)
     }
 }

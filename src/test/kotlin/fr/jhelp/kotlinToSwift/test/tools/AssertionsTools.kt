@@ -11,3 +11,9 @@ fun assertEqualsIgnoreWhiteSpaceNumber(expected: String, actual: String)
         Assertions.fail<String>(comparison)
     }
 }
+
+fun assertTransformed(kotlwiftSource: String, swiftExpected: String)
+{
+    val swiftProduced = transformCompleteClass(kotlwiftSource)
+    assertEqualsIgnoreWhiteSpaceNumber(swiftExpected, swiftProduced)
+}
