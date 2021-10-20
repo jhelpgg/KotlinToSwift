@@ -207,7 +207,7 @@ private fun parserLine(line: String, swiftWriter: BufferedWriter, inMultilineCom
 
     val transformed = parseLine(stringInterpreted)
 
-    if (transformed == FORCE_LINE_CONTINUE)
+    if (transformed == FORCE_LINE_CONTINUE || countParenthesis(stringInterpreted) != 0)
     {
         return ParseStatus.LINE_CONTINUE
     }
