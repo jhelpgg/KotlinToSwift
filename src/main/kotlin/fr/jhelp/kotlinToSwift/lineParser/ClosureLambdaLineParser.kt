@@ -4,7 +4,7 @@ import java.util.regex.Pattern
 
 private val PATTERN_CLOSURE_LAMBDA = Pattern.compile("(\\{[^-]+)->")
 private val PATTERN_WEAK_SELF = Pattern.compile("@WeakSelf\\(\"(.*)\"\\)\\s*val\\s+sSelf\\s*=\\s*self")
-private val PATTERN_WEAK_SELF_PARAMETER = Pattern.compile("\\{([^-]+)->\\s+@WeakSelf\\(\"(.*)\"\\)\\s*val\\s+sSelf\\s*=\\s*self")
+private val PATTERN_WEAK_SELF_PARAMETER = Pattern.compile("\\{([^-{]+)->\\s+@WeakSelf\\(\"(.*)\"\\)\\s*val\\s+sSelf\\s*=\\s*self")
 private const val GROUP_CLOSURE_LAMBDA_DECLARATION = 1
 private const val GROUP_CLOSURE_LAMBDA_RETURN_VALUE = 2
 private const val GROUP_CLOSURE_LAMBDA_ONLY_RETURN_VALUE = 1

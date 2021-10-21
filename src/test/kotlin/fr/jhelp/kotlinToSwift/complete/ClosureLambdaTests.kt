@@ -49,4 +49,40 @@ class ClosureLambdaTests
 
         assertTransformed(kotlwiftSource, swiftExpected)
     }
+
+    @Test
+    fun multilClosureAndWeakSelf()
+    {
+          val kotlwiftSource =
+            """
+                fun isExerciseRehabilitation(exciseKey: String, @Escaping responseHandler: (Boolean) -> Unit) {
+                    this.document.obtainValue(
+                        { serverMap ->
+                            @WeakSelf("") val sSelf = this
+                            sSelf.isExerciseRehabilitationSucceed(serverMap, exciseKey, responseHandler)
+                        },
+                        { message ->
+                            @WeakSelf("") val sSelf = this
+                            sSelf.isExerciseRehabilitationFailed(message, responseHandler)
+                        })
+                }
+            """.trimIndent()
+
+        val swiftExpected =
+            """
+                public func isExerciseRehabilitation(_ exciseKey: String, _ responseHandler: @escaping (Bool) -> Void) {
+                    self.document.obtainValue(
+                        { [weak self] serverMap in
+                            guard let sSelf = self else { return }
+                            sSelf.isExerciseRehabilitationSucceed(serverMap, exciseKey, responseHandler)
+                        },
+                        { [weak self] message in
+                            guard let sSelf = self else { return }
+                            sSelf.isExerciseRehabilitationFailed(message, responseHandler)
+                        })
+                }
+            """.trimIndent()
+
+        assertTransformed(kotlwiftSource, swiftExpected)
+    }
 }
