@@ -1,8 +1,7 @@
 package fr.jhelp.kotlinToSwift.complete
 
-import fr.jhelp.kotlinToSwift.DISABLE_AUTOMATIC_PUBLIC
-import fr.jhelp.kotlinToSwift.KotlinToSwiftOptions
 import fr.jhelp.kotlinToSwift.test.tools.DOLLAR
+import fr.jhelp.kotlinToSwift.test.tools.assertExact
 import fr.jhelp.kotlinToSwift.test.tools.assertTransformed
 import org.junit.jupiter.api.Test
 
@@ -198,5 +197,38 @@ class WeakSelfTests
             """.trimIndent()
 
         assertTransformed(kotlwiftSource, swiftExpected)
+    }
+
+    @Test
+    fun noWeakSelfRequired()
+    {
+        val kotlwiftSource =
+            """
+                class Test
+                {
+                    fun test()
+                    {
+                        method { parameter ->
+                            return@method "parameter = $DOLLAR{parameter}"
+                        }
+                    }
+                }
+            """.trimIndent()
+
+        val swiftExpected =
+            """
+                public class Test
+                {
+                    public func test()
+                    {
+                        method { parameter in 
+                            return "parameter = \(parameter)"
+                        }
+                    }
+                }
+                
+            """.trimIndent()
+
+        assertExact(kotlwiftSource, swiftExpected)
     }
 }

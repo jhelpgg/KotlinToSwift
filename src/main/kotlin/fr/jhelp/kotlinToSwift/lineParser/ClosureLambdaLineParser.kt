@@ -15,60 +15,82 @@ class ClosureLambdaLineParser : LineParser
 {
     override fun parse(trimLine: String): String
     {
-        var matcher = PATTERN_WEAK_SELF_PARAMETER.matcher(trimLine)
+        val replacement = StringBuilder(trimLine)
+        var lineToParse = trimLine
+        var someReplacementHappen = false
+        var loopReplacement = false
 
-        if (matcher.find())
+        do
         {
-            val stringBuilder = StringBuilder(trimLine.substring(0, matcher.start()))
-            stringBuilder.append("{")
-            stringBuilder.append(WEAK_SELF)
-            stringBuilder.append(matcher.group(GROUP_CLOSURE_LAMBDA_DECLARATION))
-            stringBuilder.append(" in ")
-            stringBuilder.append(GUARD_ELSE_HEADER)
-            stringBuilder.append(matcher.group(GROUP_CLOSURE_LAMBDA_RETURN_VALUE)
-                                     .replace("\\\"", "\"")
-                                     .replace("\\\\", "\\")
-                                     .replace("\\n", "\n")
-                                     .replace("\\t", "\t"))
-            stringBuilder.append(" }\n")
-            stringBuilder.append(trimLine.substring(matcher.end()).trim())
-            return stringBuilder.toString()
-        }
+            loopReplacement = false
+            lineToParse= replacement.toString()
+            replacement.clear()
 
-        matcher = PATTERN_WEAK_SELF.matcher(trimLine)
+            var matcher = PATTERN_WEAK_SELF_PARAMETER.matcher(lineToParse)
 
-        if(matcher.find())
-        {
-            val stringBuilder = StringBuilder(trimLine.substring(0, matcher.start()))
-            stringBuilder.append(WEAK_SELF)
-            stringBuilder.append(" in ")
-            stringBuilder.append(GUARD_ELSE_HEADER)
-            stringBuilder.append(matcher.group(GROUP_CLOSURE_LAMBDA_ONLY_RETURN_VALUE)
-                                     .replace("\\\"", "\"")
-                                     .replace("\\\\", "\\")
-                                     .replace("\\n", "\n")
-                                     .replace("\\t", "\t"))
-            stringBuilder.append(" }\n")
-            stringBuilder.append(trimLine.substring(matcher.end()).trim())
-            return stringBuilder.toString()
-        }
-
-        matcher = PATTERN_CLOSURE_LAMBDA.matcher(trimLine)
-
-        if (matcher.find())
-        {
-            if (trimLine.endsWith("->"))
+            if (matcher.find())
             {
-                return FORCE_LINE_CONTINUE
+                replacement.append(lineToParse.substring(0, matcher.start()))
+                replacement.append("{")
+                replacement.append(WEAK_SELF)
+                replacement.append(matcher.group(GROUP_CLOSURE_LAMBDA_DECLARATION))
+                replacement.append(" in ")
+                replacement.append(GUARD_ELSE_HEADER)
+                replacement.append(matcher.group(GROUP_CLOSURE_LAMBDA_RETURN_VALUE)
+                                         .replace("\\\"", "\"")
+                                         .replace("\\\\", "\\")
+                                         .replace("\\n", "\n")
+                                         .replace("\\t", "\t"))
+                replacement.append(" }\n")
+                replacement.append(lineToParse.substring(matcher.end()).trim())
+                someReplacementHappen = true
+                loopReplacement = true
+                continue
             }
 
-            val stringBuilder = StringBuilder(trimLine.substring(0, matcher.start()))
-            stringBuilder.append(matcher.group(GROUP_CLOSURE_LAMBDA_DECLARATION).trim())
-            stringBuilder.append(" in ")
-            stringBuilder.append(trimLine.substring(matcher.end()).trim())
-            return stringBuilder.toString()
+            matcher = PATTERN_WEAK_SELF.matcher(lineToParse)
+
+            if(matcher.find())
+            {
+                replacement.append(lineToParse.substring(0, matcher.start()))
+                replacement.append(WEAK_SELF)
+                replacement.append(" in ")
+                replacement.append(GUARD_ELSE_HEADER)
+                replacement.append(matcher.group(GROUP_CLOSURE_LAMBDA_ONLY_RETURN_VALUE)
+                                         .replace("\\\"", "\"")
+                                         .replace("\\\\", "\\")
+                                         .replace("\\n", "\n")
+                                         .replace("\\t", "\t"))
+                replacement.append(" }\n")
+                replacement.append(lineToParse.substring(matcher.end()).trim())
+                someReplacementHappen = true
+                loopReplacement = true
+                continue
+            }
+
+            matcher = PATTERN_CLOSURE_LAMBDA.matcher(lineToParse)
+
+            if (matcher.find())
+            {
+                if (trimLine.endsWith("->"))
+                {
+                    return FORCE_LINE_CONTINUE
+                }
+
+                replacement.append(lineToParse.substring(0, matcher.start()))
+                replacement.append(matcher.group(GROUP_CLOSURE_LAMBDA_DECLARATION).trim())
+                replacement.append(" in ")
+                replacement.append(lineToParse.substring(matcher.end()))
+                someReplacementHappen = true
+                loopReplacement = true
+                continue
+            }
+        } while (loopReplacement)
+
+        if(someReplacementHappen) {
+            return lineToParse
         }
 
-        return ""
+        return  ""
     }
 }
