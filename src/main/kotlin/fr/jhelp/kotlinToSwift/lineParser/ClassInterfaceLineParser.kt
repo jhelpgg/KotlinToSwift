@@ -8,17 +8,18 @@ import java.util.regex.Pattern
  *
  * Class line looks like:
  *
- *       <public|internal> class <name_generic> [: <implements_extends>] [{]
- *       <public|internal> interface <name_generic> [: <implements_extends>] [{]
+ *       [<public|internal>] [open] class <name_generic> [: <implements_extends>] [{]
+ *       [<public|internal>] [open] interface <name_generic> [: <implements_extends>] [{]
  *
- *       +--------------------------------------------+-----+-----------------------------+
- *       |                  Group                     | ID  |           Capture           |
- *       +--------------------------------------------+-----+-----------------------------+
- *       | (?:public|internal)?\s+(?:class|interface) |  1  | class/interface declaration |
- *       | \s+[a-zA-Z][a-zA-Z0-9_<>]*                 |  2  | class/interface name        |
- *       | \s*:[^{]+                                  |  3  | extends/implements          |
- *       | \s*\{                                      |  4  | Curly ending                |
- *       +--------------------------------------------+-----+-----------------------------+
+ *       +--------------------------------------------+-----+-------------------------------+
+ *       |                  Group                     | ID  |           Capture             |
+ *       +--------------------------------------------+-----+-------------------------------+
+ *       | (?:public|internal)\s+                     |  1  | class or interface visibility |
+ *       | (?:\s+open\s+)?(?:class|interface)         |  2  | class/interface declaration   |
+ *       | \s+[a-zA-Z][a-zA-Z0-9_<>]*                 |  3  | class/interface name          |
+ *       | \s*:[^{]+                                  |  4  | extends/implements            |
+ *       | \s*\{                                      |  5  | Curly ending                  |
+ *       +--------------------------------------------+-----+-------------------------------+
  */
 private val CLASS_INTERFACE_PATTERN =
     Pattern.compile("((?:public|internal)\\s+)?((?:\\s+open\\s+)?(?:class|interface))(\\s+[a-zA-Z][a-zA-Z0-9_<, >]*)(\\s*:[^{]+)?(\\s*\\{)?")

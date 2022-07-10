@@ -1,0 +1,25 @@
+@startuml
+'https://plantuml.com/state-diagram
+
+[*] -> Transpiler
+
+state Transpiler {
+    [*] -> Settings
+    Settings ->  SourceFiles
+    SourceFiles -> CopySwiftLibraries
+    CopySwiftLibraries -> [*]
+
+    state SourceFiles {
+        [*] -> IndividualTreatment
+        IndividualTreatment -> GlobalTreatment
+        GlobalTreatment -> [*]
+
+        state IndividualTreatment {
+
+        }
+    }
+}
+
+Transpiler -> [*]
+
+@enduml
