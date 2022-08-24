@@ -1,5 +1,7 @@
 package fr.jhelp.kotlinToSwift.lineParser
 
+import fr.jhelp.kotlinToSwift.KotlinToSwiftOptions
+import fr.jhelp.kotlinToSwift.splitIgnoreOpenClose
 import java.util.regex.Pattern
 
 /**
@@ -24,14 +26,18 @@ import java.util.regex.Pattern
  *      |             \s*\{                               | 6  | Eventual { ending => {                                   |
  *      +-------------------------------------------------+----+----------------------------------------------------------+
  */
-private val FUNCTION_PATTERN = Pattern.compile("(?:(@Throws)\\s+)?((?:(?:override|private|public|internal|open)\\s+)*fun)(\\s+[a-zA-Z][a-zA-Z0-9_]*\\s*)\\((.*)\\)(?:\\s*:\\s*([a-zA-Z][a-zA-Z0-9_<>?]*))?(\\s*\\{)?")
+private val FUNCTION_PATTERN =
+    Pattern.compile("(?:(@Throws)\\s+)?((?:(?:override|private|public|internal|open)\\s+)*fun)(\\s+<[a-zA-Z0-9_, :<>]+>)?(\\s+[a-zA-Z][a-zA-Z0-9_<>.]*\\s*)\\(((?:.|\\n)*)\\)(?:\\s*:\\s*([a-zA-Z][a-zA-Z0-9_<>?, ]*))?(\\s*\\{)?")
 private const val GROUP_FUN_THROW = 1
 private const val GROUP_FUN_DECLARATION = 2
-private const val GROUP_FUN_NAME = 3
-private const val GROUP_FUN_PARAMETERS = 4
-private const val GROUP_FUN_RETURN_TYPE = 5
-private const val GROUP_FUN_END_CURLY = 6
+private const val GROUP_FUN_GENERIC = 3
+private const val GROUP_FUN_NAME = 4
+private const val GROUP_FUN_PARAMETERS = 5
+private const val GROUP_FUN_RETURN_TYPE = 6
+private const val GROUP_FUN_END_CURLY = 7
+private val VISIBILITY_PATTERN = Pattern.compile("private|public|internal")
 private val REMOVE_OVERRIDE_OF = arrayOf("toString")
+private const val ESCAPING = "@Escaping"
 
 class FunLineParser : LineParser
 {
@@ -42,12 +48,35 @@ class FunLineParser : LineParser
         if (matcherFun.matches())
         {
             val parsed = StringBuilder()
-            val name = matcherFun.group(GROUP_FUN_NAME)
+            var name = matcherFun.group(GROUP_FUN_NAME)
+
+            val indexPoint = name.lastIndexOf('.')
+
+            if (indexPoint >= 0)
+            {
+                val indexSpace = name.lastIndexOf(' ', indexPoint)
+
+                name =
+                    if (indexSpace >= 0)
+                    {
+                        name.substring(0, indexSpace + 1) + name.substring(indexPoint + 1)
+                    }
+                    else
+                    {
+                        name.substring(indexPoint + 1)
+                    }
+            }
+
             var declaration = matcherFun.group(GROUP_FUN_DECLARATION)
 
             if (name.trim() in REMOVE_OVERRIDE_OF && declaration.startsWith("override"))
             {
                 declaration = declaration.substring(8).trim()
+            }
+
+            if (KotlinToSwiftOptions.automaticPublic && !VISIBILITY_PATTERN.matcher(declaration).find() && !declaration.contains("open"))
+            {
+                declaration = "public $declaration"
             }
 
             // Declaration in Swift is the same, just have to add a 'c' at end to transform 'fun' to 'func'
@@ -56,6 +85,9 @@ class FunLineParser : LineParser
 
             // Function name
             parsed.append(name)
+
+            // generic part
+            matcherFun.group(GROUP_FUN_GENERIC)?.let { generic -> parsed.append(generic) }
 
             // Function parameters
             parsed.append('(')
@@ -87,7 +119,7 @@ fun parseParameters(parameters: String, parsed: StringBuilder)
         return
     }
 
-    val parametersList = parametersTrim.split(",")
+    val parametersList = parametersTrim.splitIgnoreOpenClose(',', Pair('<', '>'))
     parseParameter(parametersList[0].trim(), parsed)
 
     (1 until parametersList.size).forEach { index ->
@@ -98,17 +130,38 @@ fun parseParameters(parameters: String, parsed: StringBuilder)
 
 fun parseParameter(parameter: String, parsed: StringBuilder)
 {
+    var hasEscaping = false
+    val parameterClean =
+        if (parameter.startsWith(ESCAPING))
+        {
+            hasEscaping = true
+            parameter.substring(ESCAPING.length).trim()
+        }
+        else
+        {
+            parameter
+        }
+
     parsed.append("_ ")
 
-    if (parameter.contains("->"))
+    if (parameterClean.contains("->"))
     {
-        val index = parameter.indexOf(':')
-        parsed.append(parameter.substring(0, index + 1))
-        parsed.append(" @escaping ")
-        parsed.append(parameter.substring(index + 1))
+        val index = parameterClean.indexOf(':')
+        parsed.append(parameterClean.substring(0, index + 1))
+
+        if (hasEscaping)
+        {
+            parsed.append(" @escaping ")
+        }
+        else
+        {
+            parsed.append(' ')
+        }
+
+        parsed.append(parameterClean.substring(index + 1))
     }
     else
     {
-        parsed.append(parameter)
+        parsed.append(parameterClean)
     }
 }

@@ -2,7 +2,7 @@ package fr.jhelp.kotlinToSwift.lineParser
 
 import java.util.regex.Pattern
 
-private val PATTERN_IF_WHILE_FOR = Pattern.compile("(if|while|for)\\s*\\((.*)\\)(\\s*\\{)?")
+private val PATTERN_IF_WHILE_FOR = Pattern.compile("((?:else\\s+)?if|while|for)\\s*\\((.*)\\)(\\s*\\{)?")
 private const val GROUP_IF_WHILE_FOR_KEY_WORD = 1
 private const val GROUP_IF_WHILE_FOR_CONDITION = 2
 private const val GROUP_IF_WHILE_FOR_CURLY = 3

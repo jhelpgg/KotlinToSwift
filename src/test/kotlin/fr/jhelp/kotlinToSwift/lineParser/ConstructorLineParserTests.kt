@@ -1,6 +1,6 @@
 package fr.jhelp.kotlinToSwift.lineParser
 
-import org.junit.jupiter.api.Assertions
+import fr.jhelp.kotlinToSwift.test.tools.assertEqualsIgnoreWhiteSpaceNumber
 import org.junit.jupiter.api.Test
 
 class ConstructorLineParserTests
@@ -9,11 +9,11 @@ class ConstructorLineParserTests
     fun parseConstructor()
     {
         val constructorLineParser = ConstructorLineParser()
-        Assertions.assertEquals("init(){",
-                                constructorLineParser.parse("constructor()\n{"))
-        Assertions.assertEquals("convenience override init(_ age:Int){\n     self.init(\"P\", age) ",
-                                constructorLineParser.parse("@Override constructor(age:Int) : this(\"P\", age) {"))
-        Assertions.assertEquals("init(_ age:Int) throws {\n     super.init(age) ",
-                                constructorLineParser.parse("@Throws constructor(age:Int) : super(age) {"))
+        assertEqualsIgnoreWhiteSpaceNumber("public init() {",
+                                           constructorLineParser.parse("constructor()\n{"))
+        assertEqualsIgnoreWhiteSpaceNumber("convenience override public init(_ age:Int) {\n     self.init(\"P\", age) ",
+                                           constructorLineParser.parse("@Override constructor(age:Int) : this(\"P\", age) {"))
+        assertEqualsIgnoreWhiteSpaceNumber("public init(_ age:Int) throws {\n     super.init(age) ",
+                                           constructorLineParser.parse("@Throws constructor(age:Int) : super(age) {"))
     }
 }

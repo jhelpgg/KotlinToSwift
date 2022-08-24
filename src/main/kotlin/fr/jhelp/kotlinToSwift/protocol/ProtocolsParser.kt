@@ -1,18 +1,18 @@
 package fr.jhelp.kotlinToSwift.protocol
 
 import java.io.File
-import java.util.*
+import java.util.Stack
+import java.util.TreeSet
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 val PROTOCOL = Pattern.compile(
-    "protocol\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(<[a-zA-Z0-9_, ]+>)?\\s*(:\\s*[a-zA-Z0-9_,<> ]+)?\\s*\\{")
+    "protocol\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(<[a-zA-Z0-9_, :]+>)?\\s*(:\\s*[a-zA-Z0-9_,<> ]+)?\\s*\\{")
 val GROUP_NAME = 1
 val GROUP_PROTOCOL_GENERICS = 2
 val GROUP_IMPLEMENTED_PROTOCOLS = 3
-val PROTOCOL_IMPLEMENTS = Pattern.compile("([a-zA-Z][a-zA-Z0-9_]*)\\s*(<[a-zA-Z0-9_, ]+>)?")
 val PROTOCOL_OR_CLASS = Pattern.compile(
-    "(protocol|class)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(<[a-zA-Z0-9_, ]+>)?\\s*(:\\s*[a-zA-Z0-9_,<> ]+)?\\s*\\{")
+    "(protocol|class)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(<[a-zA-Z0-9_, :]+>)?\\s*(:\\s*[a-zA-Z0-9_,<> ]+)?\\s*\\{")
 val GROUP_PROTOCOL_OR_CLASS = 1
 val GROUP_PROTOCOL_OR_CLASS_NAME = 2
 val GROUP_PROTOCOL_OR_CLASS_GENERICS = 3
@@ -23,9 +23,20 @@ val GROUP_GENERIC_NAME = 2
 val GROUP_GENERIC_ENDING = 3
 val METHOD_DESCRIPTION = Pattern.compile("func\\s*([a-zA-Z][a-zA-Z0-9_]*)\\s*\\(")
 val GROUP_METHOD_NAME = 1
-val METHOD_OVERRIDE_DESCRIPTION = Pattern.compile("override\\s+func\\s*([a-zA-Z][a-zA-Z0-9_]*)\\s*\\(")
+val METHOD_OVERRIDE_DESCRIPTION = Pattern.compile("((?:internal|public)\\s+)?override\\s+func\\s*([a-zA-Z][a-zA-Z0-9_]*)\\s*\\(")
+const val GROUP_OVERRIDE_INTERNAL_PUBLIC = 1
+const val GROUP_OVERRIDE_METHOD_NAME = 2
+val PUBLIC_FUN = Pattern.compile("public\\s+fun")
+val METHOD_RETURN_GENERIC = Pattern.compile("(.*)func\\s*([a-zA-Z][a-zA-Z0-9_]*)\\s*(<.*>)?\\s*\\(((?:.|,\\n)*)\\)\\s*->\\s*([a-zA-Z][a-zA-Z0-9_]*)\\s*<(.*)>(\\s*)")
+const val GROUP_METHOD_RETURN_GENERIC_HEADER = 1
+const val GROUP_METHOD_RETURN_GENERIC_NAME = 2
+const val GROUP_METHOD_RETURN_GENERIC_GENERICS = 3
+const val GROUP_METHOD_RETURN_GENERIC_PARAMETERS = 4
+const val GROUP_METHOD_RETURN_GENERIC_TYPE = 5
+const val GROUP_METHOD_RETURN_GENERIC_TYPE_GENERIC = 6
+const val GROUP_METHOD_RETURN_GENERIC_ENDING_SPACES = 7
 
-class ProtocolsParser
+object ProtocolsParser
 {
     val protocols = HashMap<String, Protocol>()
 
@@ -36,7 +47,6 @@ class ProtocolsParser
         val generics: String?
         val implemented: String?
         val protocol: Protocol
-        val matcherImplements: Matcher
         var implementsName: String
         var implementsGenerics: String?
         var index: Int
@@ -53,19 +63,43 @@ class ProtocolsParser
             generics?.substring(1, generics.length - 1)
                 ?.split(',')
                 ?.forEach { genericName ->
-                    val trim = genericName.trim()
-                    protocol.generics[trim] = Generic(index, genericName, "${name}_$trim")
+                    var trim = genericName.trim()
+                    val indexColon = trim.indexOf(':')
+                    val extended: String
+
+                    if (indexColon >= 0)
+                    {
+                        extended = trim.substring(indexColon)
+                        trim = trim.substring(0, indexColon).trim()
+                    }
+                    else
+                    {
+                        extended = ""
+                    }
+
+                    val replaceName =
+                        if (trim.length > 3)
+                        {
+                            trim
+                        }
+                        else
+                        {
+                            "${name}_$trim"
+                        }
+
+                    protocol.generics[trim] = Generic(index, trim, replaceName, extended)
                     index++
                 }
 
             if (implemented != null)
             {
-                matcherImplements = PROTOCOL_IMPLEMENTS.matcher(implemented.substring(1).trim())
+                val extendedGenericsIterator = ExtendedGenericsIterator(implemented.substring(1).trim())
 
-                while (matcherImplements.find())
+                while (extendedGenericsIterator.hasNext())
                 {
-                    implementsName = matcherImplements.group(GROUP_NAME)
-                    implementsGenerics = matcherImplements.group(GROUP_PROTOCOL_GENERICS)
+                    val (extended, generics) = extendedGenericsIterator.next()
+                    implementsName = extended
+                    implementsGenerics = generics
                     indexInProtocol = 0
                     implementsGenerics?.substring(1, implementsGenerics.length - 1)
                         ?.split(',')
@@ -112,7 +146,8 @@ class ProtocolsParser
                     }
                 }
             }
-        } while (changed)
+        }
+        while (changed)
     }
 
     fun transform(file: String): String
@@ -125,7 +160,6 @@ class ProtocolsParser
         var start = 0
         var end: Int
         val protocolsTypes = ArrayList<Pair<Protocol, List<String>>>()
-        var matcherImplements: Matcher
         var first: Boolean
         var implementsName: String
         var implementsGenerics: String?
@@ -166,10 +200,10 @@ class ProtocolsParser
             matcher.group(GROUP_PROTOCOL_OR_CLASS_IMPLEMENTED)?.let { implemented ->
                 transformed.append(" : ")
 
-                matcherImplements = PROTOCOL_IMPLEMENTS.matcher(implemented.substring(1).trim())
+                val extendedGenericsIterator = ExtendedGenericsIterator(implemented.substring(1).trim())
                 first = true
 
-                while (matcherImplements.find())
+                while (extendedGenericsIterator.hasNext())
                 {
                     if (!first)
                     {
@@ -177,8 +211,9 @@ class ProtocolsParser
                     }
 
                     first = false
-                    implementsName = matcherImplements.group(GROUP_NAME)
-                    implementsGenerics = matcherImplements.group(GROUP_PROTOCOL_GENERICS)
+                    val (extended, generics) = extendedGenericsIterator.next()
+                    implementsName = extended
+                    implementsGenerics = generics
                     transformed.append(implementsName)
                     protocol = this.protocols[implementsName]
 
@@ -205,7 +240,7 @@ class ProtocolsParser
                 currentProtocol.generics.values.forEach { generic ->
                     if (generic.fromProtocol == null)
                     {
-                        transformed.append("     associatedtype ${generic.replaceName}\n")
+                        transformed.append("     associatedtype ${generic.replaceName}${generic.extended}\n")
                     }
                 }
 
@@ -224,7 +259,8 @@ class ProtocolsParser
 
                     transformed.append(matcherGenericName.group(GROUP_GENERIC_SEPARATOR))
                     genericName = matcherGenericName.group(GROUP_GENERIC_NAME)
-                    transformed.append(currentProtocol.generics[genericName]?.replaceName ?: genericName)
+                    transformed.append(currentProtocol.generics[genericName]?.replaceName
+                                       ?: genericName)
                     matcherGenericName.group(GROUP_GENERIC_ENDING)?.let { transformed.append(it) }
                     end = matcherGenericName.end() + more
                 }
@@ -234,7 +270,7 @@ class ProtocolsParser
                 protocolsTypes.forEach { (protocol, types) ->
                     for (index in 0 until protocol.size)
                     {
-                        transformed.append("     typealias ${protocol[index].replaceName} = ${types[index]}\n")
+                        transformed.append("     public typealias ${protocol[index].replaceName} = ${types[index]}\n")
                     }
                 }
             }
@@ -247,12 +283,19 @@ class ProtocolsParser
             transformed.append(file.substring(start))
         }
 
-        val toClear = transformed.toString()
+        val toClear = if (isProtocol)
+        {
+            PUBLIC_FUN.matcher(transformed.toString()).replaceAll("fun")
+        }
+        else
+        {
+            transformed.toString()
+        }
 
-//        if (isProtocol)
-//        {
-//            return toClear.replace("func ", "mutating func ")
-//        }
+        //        if (isProtocol)
+        //        {
+        //            return toClear.replace("func ", "mutating func ")
+        //        }
 
         transformed = StringBuilder()
         val length = toClear.length
@@ -261,22 +304,22 @@ class ProtocolsParser
         val protocolsTreated = TreeSet<String>()
         val methodsName = TreeSet<String>()
         val stack = Stack<Protocol>()
-        var prot:Protocol
+        var prot: Protocol
 
         protocolsTypes.forEach { (protocol, _) -> stack.push(protocol) }
 
-        while(stack.isNotEmpty())
+        while (stack.isNotEmpty())
         {
             prot = stack.pop()
 
-            if(protocolsTreated.add(prot.name))
+            if (protocolsTreated.add(prot.name))
             {
                 methodsName.addAll(prot.methodsName)
 
-                prot.generics.forEach { (_ , generic) ->
+                prot.generics.forEach { (_, generic) ->
                     val from = generic.fromProtocol
 
-                    if(from!=null && from !in protocolsTreated)
+                    if (from != null && from !in protocolsTreated)
                     {
                         stack.push(this.protocols[from])
                     }
@@ -295,7 +338,9 @@ class ProtocolsParser
                 transformed.append(toClear.substring(start, end))
             }
 
-            methodName = matcher.group(GROUP_METHOD_NAME)
+            matcher.group(GROUP_OVERRIDE_INTERNAL_PUBLIC)?.let { header -> transformed.append(header) }
+
+            methodName = matcher.group(GROUP_OVERRIDE_METHOD_NAME)
 
             if (methodName in methodsName)
             {
@@ -319,17 +364,87 @@ class ProtocolsParser
 
         return transformed.toString()
     }
+
+    fun returnProtocolMethods(file: String): String
+    {
+        val transformed = StringBuilder()
+        val matcher = METHOD_RETURN_GENERIC.matcher(file)
+        var start = 0
+
+        while (matcher.find())
+        {
+            val end = matcher.start()
+            transformed.append(file.substring(start, end))
+            val returnGenericType: String = matcher.group(GROUP_METHOD_RETURN_GENERIC_TYPE)
+            val protocol = this.protocols[returnGenericType]
+
+            if (protocol == null)
+            {
+                transformed.append(matcher.group(0))
+            }
+            else
+            {
+                transformed.append(matcher.group(GROUP_METHOD_RETURN_GENERIC_HEADER))
+                transformed.append("func ")
+                transformed.append(matcher.group(GROUP_METHOD_RETURN_GENERIC_NAME))
+                val methodGenerics = matcher.group(GROUP_METHOD_RETURN_GENERIC_GENERICS)
+
+                if (methodGenerics == null)
+                {
+                    transformed.append("<")
+                }
+                else
+                {
+                    transformed.append(methodGenerics.substring(0, methodGenerics.length - 1))
+                    transformed.append(", ")
+                }
+
+                transformed.append("RETURN_")
+                transformed.append(protocol.name)
+                transformed.append(":")
+                transformed.append(protocol.name)
+                transformed.append("> (")
+                transformed.append(matcher.group(GROUP_METHOD_RETURN_GENERIC_PARAMETERS))
+                transformed.append(") -> RETURN_")
+                transformed.append(protocol.name)
+                transformed.append(" where ")
+                val generics: List<String> = matcher.group(GROUP_METHOD_RETURN_GENERIC_TYPE_GENERIC).split(",")
+
+                for ((index, name) in generics.withIndex())
+                {
+                    if (index > 0)
+                    {
+                        transformed.append(" && ")
+                    }
+
+                    transformed.append("RETURN_")
+                    transformed.append(protocol.name)
+                    transformed.append(".")
+                    transformed.append(protocol[index].replaceName)
+                    transformed.append("==")
+                    transformed.append(name)
+                }
+
+                transformed.append(matcher.group(GROUP_METHOD_RETURN_GENERIC_ENDING_SPACES))
+            }
+
+            start = matcher.end()
+        }
+
+        transformed.append(file.substring(start))
+        return transformed.toString()
+    }
 }
 
 fun parseProtocolsInFiles(files: List<File>)
 {
-    val protocolsParser = ProtocolsParser()
-    files.forEach { protocolsParser.addFile(it.readText()) }
-    protocolsParser.compile()
+    files.forEach { ProtocolsParser.addFile(it.readText()) }
+    ProtocolsParser.compile()
     var transformed: String
 
     files.forEach { file ->
-        transformed = protocolsParser.transform(file.readText())
+        transformed = ProtocolsParser.transform(file.readText())
+        transformed = ProtocolsParser.returnProtocolMethods(transformed)
         file.writeText(transformed)
     }
 }

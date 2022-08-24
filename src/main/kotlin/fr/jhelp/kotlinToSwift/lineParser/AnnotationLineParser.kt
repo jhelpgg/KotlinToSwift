@@ -8,7 +8,9 @@ private val ANNOTATION_REPLACEMENT = arrayOf(
     Pair(Pattern.compile("@Try\\s+((?:(?:var|val|let)\\s+)?[a-zA-Z0-9_\\[\\]]+\\s*=)(.*)"), "$1 try $2"),
     Pair(Pattern.compile("@Try\\s+return\\s+(.*)"), "return try $1"),
     Pair(Pattern.compile("@Try([^a-zA-Z0-9_].*)"), "try$1"),
-    Pair(Pattern.compile("@Override([^a-zA-Z0-9_].*)"), "override$1"))
+    Pair(Pattern.compile("@Override([^a-zA-Z0-9_].*)"), "override$1"),
+    Pair(Pattern.compile("@Super"), "@Super"),
+    Pair(Pattern.compile("@Extension\\s*\\(\\s*\"([a-zA-Z0-9_]+)\"\\s*\\)"),"public extension $1 {"))
 
 
 class AnnotationLineParser : LineParser

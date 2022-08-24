@@ -5,7 +5,7 @@ plugins {
     application
 }
 group = "me.gerardbourriaud"
-version = "1.0-SNAPSHOT"
+version = "1.1.2-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -24,5 +24,6 @@ tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"
 }
 application {
-    mainClassName = "MainKt"
+    mainClassName = "fr.jhelp.kotlinToSwift.ToSwiftKt"
 }
+
