@@ -14,7 +14,6 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
-import java.util.ArrayList
 import java.util.Stack
 
 const val KotlinExtension = "kt"
@@ -71,7 +70,7 @@ fun swiftTransformer(directorySource: File, directoryDestination: File)
                 destination.mkdirs()
             }
 
-            source.listFiles(KotlinFileFilter).forEach { stack.push(Pair(it, File(destination, it.name))) }
+            source.listFiles(KotlinFileFilter)?.forEach { stack.push(Pair(it, File(destination, it.name))) }
         }
         else
         {
@@ -84,7 +83,7 @@ fun swiftTransformer(directorySource: File, directoryDestination: File)
     postTreatments(listSwiftFiles)
 }
 
-private fun internalSwiftTransformer(source: File, destination: File)
+fun internalSwiftTransformer(source: File, destination: File)
 {
     if (!destination.exists())
     {
@@ -104,8 +103,8 @@ private fun internalSwiftTransformer(source: File, destination: File)
         swiftWriter = BufferedWriter(OutputStreamWriter(FileOutputStream(destination)))
         println("${source.absolutePath} -> ${destination.absolutePath}")
         var line = kotlinReader.readLine()
-        var lineAfter: String? = null
-        var lineAfterTrimmed: String? = null
+        var lineAfter: String?
+        var lineAfterTrimmed: String?
         var inMultilineComment = false
 
         while (line != null)
@@ -208,7 +207,7 @@ private fun parserLine(line: String, swiftWriter: BufferedWriter, inMultilineCom
 
     val transformed = parseLine(stringInterpreted)
 
-    if (transformed == FORCE_LINE_CONTINUE)
+    if (transformed == FORCE_LINE_CONTINUE || countParenthesis(stringInterpreted) != 0)
     {
         return ParseStatus.LINE_CONTINUE
     }

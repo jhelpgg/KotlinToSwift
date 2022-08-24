@@ -17,8 +17,10 @@ class FunLineParserTests
                                            funLineParser.parse("override public fun test(age:Int, name:String) : Boolean"))
         assertEqualsIgnoreWhiteSpaceNumber("private func mayFail() throws ",
                                            funLineParser.parse("@Throws private fun mayFail()"))
-        assertEqualsIgnoreWhiteSpaceNumber("open public func test(_ task : @escaping  ()->Int)",
+        assertEqualsIgnoreWhiteSpaceNumber("open public func test(_ task : ()->Int)",
                                            funLineParser.parse("open public fun test(task : ()->Int)"))
+        assertEqualsIgnoreWhiteSpaceNumber("open public func test(_ task : @escaping  ()->Int)",
+                                           funLineParser.parse("open public fun test(@Escaping task : ()->Int)"))
         assertEqualsIgnoreWhiteSpaceNumber("public func next() -> Element<T>?",
                                            funLineParser.parse("fun next(): Element<T>?"))
     }

@@ -11,7 +11,6 @@ val PROTOCOL = Pattern.compile(
 val GROUP_NAME = 1
 val GROUP_PROTOCOL_GENERICS = 2
 val GROUP_IMPLEMENTED_PROTOCOLS = 3
-val PROTOCOL_IMPLEMENTS = Pattern.compile("([a-zA-Z][a-zA-Z0-9_]*)\\s*(<[a-zA-Z0-9_, ]+>)?")
 val PROTOCOL_OR_CLASS = Pattern.compile(
     "(protocol|class)\\s+([a-zA-Z][a-zA-Z0-9_]*)\\s*(<[a-zA-Z0-9_, :]+>)?\\s*(:\\s*[a-zA-Z0-9_,<> ]+)?\\s*\\{")
 val GROUP_PROTOCOL_OR_CLASS = 1
@@ -48,7 +47,6 @@ object ProtocolsParser
         val generics: String?
         val implemented: String?
         val protocol: Protocol
-        val matcherImplements: Matcher
         var implementsName: String
         var implementsGenerics: String?
         var index: Int
@@ -67,12 +65,15 @@ object ProtocolsParser
                 ?.forEach { genericName ->
                     var trim = genericName.trim()
                     val indexColon = trim.indexOf(':')
-                    val extended : String
+                    val extended: String
 
-                    if(indexColon>=0) {
+                    if (indexColon >= 0)
+                    {
                         extended = trim.substring(indexColon)
-                        trim = trim.substring(0,indexColon).trim()
-                    } else {
+                        trim = trim.substring(0, indexColon).trim()
+                    }
+                    else
+                    {
                         extended = ""
                     }
 
@@ -92,12 +93,13 @@ object ProtocolsParser
 
             if (implemented != null)
             {
-                matcherImplements = PROTOCOL_IMPLEMENTS.matcher(implemented.substring(1).trim())
+                val extendedGenericsIterator = ExtendedGenericsIterator(implemented.substring(1).trim())
 
-                while (matcherImplements.find())
+                while (extendedGenericsIterator.hasNext())
                 {
-                    implementsName = matcherImplements.group(GROUP_NAME)
-                    implementsGenerics = matcherImplements.group(GROUP_PROTOCOL_GENERICS)
+                    val (extended, generics) = extendedGenericsIterator.next()
+                    implementsName = extended
+                    implementsGenerics = generics
                     indexInProtocol = 0
                     implementsGenerics?.substring(1, implementsGenerics.length - 1)
                         ?.split(',')
@@ -158,7 +160,6 @@ object ProtocolsParser
         var start = 0
         var end: Int
         val protocolsTypes = ArrayList<Pair<Protocol, List<String>>>()
-        var matcherImplements: Matcher
         var first: Boolean
         var implementsName: String
         var implementsGenerics: String?
@@ -199,10 +200,10 @@ object ProtocolsParser
             matcher.group(GROUP_PROTOCOL_OR_CLASS_IMPLEMENTED)?.let { implemented ->
                 transformed.append(" : ")
 
-                matcherImplements = PROTOCOL_IMPLEMENTS.matcher(implemented.substring(1).trim())
+                val extendedGenericsIterator = ExtendedGenericsIterator(implemented.substring(1).trim())
                 first = true
 
-                while (matcherImplements.find())
+                while (extendedGenericsIterator.hasNext())
                 {
                     if (!first)
                     {
@@ -210,8 +211,9 @@ object ProtocolsParser
                     }
 
                     first = false
-                    implementsName = matcherImplements.group(GROUP_NAME)
-                    implementsGenerics = matcherImplements.group(GROUP_PROTOCOL_GENERICS)
+                    val (extended, generics) = extendedGenericsIterator.next()
+                    implementsName = extended
+                    implementsGenerics = generics
                     transformed.append(implementsName)
                     protocol = this.protocols[implementsName]
 

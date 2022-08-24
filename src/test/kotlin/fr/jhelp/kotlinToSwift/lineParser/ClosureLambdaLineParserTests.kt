@@ -15,7 +15,7 @@ class ClosureLambdaLineParserTests
                                            closureLambdaLineParser.parse("val f = { x -> x+1 }"))
         assertEqualsIgnoreWhiteSpaceNumber("{ (x, y) in x + 2*y }",
                                            closureLambdaLineParser.parse("{ (x, y) -> x + 2*y }"))
-        assertEqualsIgnoreWhiteSpaceNumber("{ (x, y, z) in ",
+        assertEqualsIgnoreWhiteSpaceNumber(FORCE_LINE_CONTINUE,
                                            closureLambdaLineParser.parse("{ (x, y, z) ->"))
     }
 }
