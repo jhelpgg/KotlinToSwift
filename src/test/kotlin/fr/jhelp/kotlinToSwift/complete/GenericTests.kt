@@ -51,6 +51,7 @@ internal class ActionUnwrapSuccess<Result> : ActionTransformer<FutureResult<Resu
         super.init() 
     }
 
+    @discardableResult
     public override func transform(_ parameter: FutureResult<Result>) -> Result {
         return parameter.result!.result!
     }

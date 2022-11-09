@@ -11,9 +11,9 @@ class FunLineParserTests
         val funLineParser = FunLineParser()
         assertEqualsIgnoreWhiteSpaceNumber("public func test()",
                                            funLineParser.parse("public fun test()"))
-        assertEqualsIgnoreWhiteSpaceNumber("public func toString() -> String",
+        assertEqualsIgnoreWhiteSpaceNumber("@discardableResult\n    public func toString() -> String",
                                            funLineParser.parse("override public fun toString() : String"))
-        assertEqualsIgnoreWhiteSpaceNumber("override public func test(_ age:Int, _ name:String) -> Boolean",
+        assertEqualsIgnoreWhiteSpaceNumber("@discardableResult\n    override public func test(_ age:Int, _ name:String) -> Boolean",
                                            funLineParser.parse("override public fun test(age:Int, name:String) : Boolean"))
         assertEqualsIgnoreWhiteSpaceNumber("private func mayFail() throws ",
                                            funLineParser.parse("@Throws private fun mayFail()"))
@@ -21,7 +21,7 @@ class FunLineParserTests
                                            funLineParser.parse("open public fun test(task : ()->Int)"))
         assertEqualsIgnoreWhiteSpaceNumber("open public func test(_ task : @escaping  ()->Int)",
                                            funLineParser.parse("open public fun test(@Escaping task : ()->Int)"))
-        assertEqualsIgnoreWhiteSpaceNumber("public func next() -> Element<T>?",
+        assertEqualsIgnoreWhiteSpaceNumber("@discardableResult\n    public func next() -> Element<T>?",
                                            funLineParser.parse("fun next(): Element<T>?"))
     }
 }

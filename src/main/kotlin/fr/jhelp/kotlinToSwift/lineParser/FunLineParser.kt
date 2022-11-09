@@ -38,6 +38,7 @@ private const val GROUP_FUN_END_CURLY = 7
 private val VISIBILITY_PATTERN = Pattern.compile("private|public|internal")
 private val REMOVE_OVERRIDE_OF = arrayOf("toString")
 private const val ESCAPING = "@Escaping"
+private const val DISCARDABLE_RESULT = "@discardableResult\n    "
 
 class FunLineParser : LineParser
 {
@@ -100,6 +101,9 @@ class FunLineParser : LineParser
             matcherFun.group(GROUP_FUN_RETURN_TYPE)?.let {
                 parsed.append(" -> ")
                 parsed.append(it)
+
+                parsed.insert(0, DISCARDABLE_RESULT)
+                println("REMOVE_ME will add @discardableResult for : \n$trimLine")
             }
 
             matcherFun.group(GROUP_FUN_END_CURLY)?.let { parsed.append(it) }
